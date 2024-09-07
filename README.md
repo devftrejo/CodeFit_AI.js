@@ -8,19 +8,31 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 
 ## Built With
 
+### Frontend
+
 <div align="center">
    <div id="badges">
        <a href="">
          <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML 5 Badge"/>
        </a>
        <a href="">
-         <img src="https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white" alt="Sass Badge"/>
+         <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS 3 Badge"/>
        </a>
        <a href="">
          <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript Badge"/>
        </a>
+   </div>
+</div>
+
+### Backend
+
+<div align="center">
+   <div id="badges">
        <a href="">
-         <img src="https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap Badge"/>
+         <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node JS Badge"/>
+       </a>
+       <a href="">
+         <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" alt="Express JS Badge"/>
        </a>
    </div>
 </div>
@@ -51,23 +63,30 @@ To get a local copy up and running follow these steps:
      git clone "repository-url"
      ```
      (This repository's URL goes in the quotes).
-3. Use your preferred method to navigate to the project directory and then install the project's dependencies:
+3. Use your preferred method to navigate into each of the project's directories (Client & Server) and then install the project's dependencies in each:
    - NPM Install
      ```
      npm install
      ```
-4. Start the development server:
+4. Start Vite's dev server (Client):
    - Dev Server
      ```
      npm run dev
      ```
+5. Start express server w/ Nodemon (Server):
+   - Express Server
+     ```
+     npm run watch
+     ```
+
 #### Development
+
 1. Make sure to update your working tree with a pull each time you start work on the project.
    - Git Pull
      ```
      git pull
      ```
-2. To make a production build, preview it, and push new changes:
+2. To make a production build, preview it, and push new changes (Client ONLY):
    - NPM Build
      ```
      npm run build

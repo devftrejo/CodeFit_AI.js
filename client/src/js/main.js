@@ -1,11 +1,3 @@
-// Import our custom CSS:
-
-import "../scss/styles.scss";
-
-// Import all of Bootstrap's JS:
-
-import * as bootstrap from "bootstrap";
-
 // OpenAI API & Express Server:
 
 const chatMessages = document.getElementById("chatMessages");
@@ -65,9 +57,6 @@ async function sendMessage() {
           }
         }
       }
-
-      // const data = await response.json();
-      // addMessage(data.reply);
     } catch (error) {
       console.error("Error:", error);
       addMessage("An error occurred while processing your request.");

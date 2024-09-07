@@ -1,6 +1,11 @@
-// Import all of Bootstrap's CSS:
+/* Variables: */
 
-@import "bootstrap/scss/bootstrap";
+:root {
+  --custom-yellow: #f7df1e;
+  --black: #000;
+}
+
+/* Global Styles */
 
 body {
   font-family: Arial, sans-serif;
