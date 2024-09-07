@@ -14,14 +14,14 @@ const openai = new OpenAI({
 
 app.post("/", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, systemMessage } = req.body;
     const stream = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
           content:
-            "You are a helpful coding assistant. Your name is 'Code Fit AI JS'. You will be provided with a piece of JavaScript code, and your task is to explain it in a concise way. Do not answer queries unrelated to code. Never break character.",
+            systemMessage || "Say that you need context to provide an answer.",
         },
         { role: "user", content: message },
       ],
@@ -41,7 +41,6 @@ app.post("/", async (req, res) => {
 
     res.write(`data: [DONE]\n\n`);
     res.end();
-    // res.json({ reply: response.choices[0].message.content });
   } catch (error) {
     console.error("Error:", error);
     res

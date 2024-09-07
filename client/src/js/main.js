@@ -16,6 +16,8 @@ function addMessage(content, isUser = false) {
 
 async function sendMessage() {
   const message = userInput.value.trim();
+  const systemMessage =
+    "You are a helpful coding assistant. Your name is 'Code Fit AI JS'. You will be provided with a piece of JavaScript code, and your task is to explain it in a concise way. Do not answer queries unrelated to code. Never break character.";
   if (message) {
     addMessage(message, true);
     userInput.value = "";
@@ -28,7 +30,7 @@ async function sendMessage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, systemMessage }),
       });
 
       if (!response.ok) {
