@@ -1,0 +1,84 @@
+/* Global Styles: */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+html {
+  background: url(../assets/img/subtle_carbon.webp) repeat center center fixed;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.row {
+  display: flex;
+  height: 100vh;
+}
+
+.column-left {
+  flex: 25%;
+  padding: 10px;
+}
+
+.column-right {
+  flex: 75%;
+  padding: 10px;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dark-gray);
+  box-shadow: 0 4px 8px 0 rgba(255, 255, 0, 0.2);
+  transition: 0.3s;
+}
+
+.container:hover {
+  box-shadow: 0 8px 16px 0 rgba(255, 255, 0, 0.2),
+    0 0 10px 2px rgba(255, 255, 0, 0.8);
+}
+
+.button {
+  width: 100px;
+  height: 30px;
+  padding: 5px 10px;
+  background-color: var(--js-yellow);
+  color: var(--black);
+  border: none;
+  border-radius: 3px;
+  margin-left: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px 0 rgba(255, 255, 0, 0.2);
+  transition: transform 0.2s;
+  text-align: center;
+}
+
+.button:hover {
+  box-shadow: 0 8px 16px 0 rgba(255, 255, 0, 0.2),
+    0 0 10px 2px rgba(255, 255, 0, 0.8);
+  transform: translateY(2px);
+}
+
+.button:active {
+  transform: translateY(-2px);
+}

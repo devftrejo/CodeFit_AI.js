@@ -1,0 +1,45 @@
+/* AI Chat */
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  margin-top: 40px;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+}
+
+#userInput {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  background-color: var(--semi-black);
+  color: var(--light-gray);
+}
+
+#userInput::placeholder {
+  color: var(--light-gray);
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  max-width: 100%;
+}
+
+.user-message {
+  background-color: var(--semi-black);
+  color: var(--light-gray);
+  align-self: flex-end;
+}
+
+.bot-message {
+  background-color: var(--semi-black);
+  color: var(--light-blue);
+  align-self: flex-start;
+}

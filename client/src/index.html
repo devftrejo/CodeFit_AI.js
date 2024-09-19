@@ -3,17 +3,193 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>CodeFit_AI.js</title>
+
+    <!-- Start Google Fonts -->
+
+    <!-- Roboto -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Share Tech -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- End Google Fonts -->
+
+    <!-- Start Code Editor CDN JS Links -->
+
+    <!-- Code Mirror -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/comment-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/comment/comment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
+
+    <!-- Font Awesome -->
+
+    <script
+      src="https://kit.fontawesome.com/35db684345.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- End Code Editor CDN JS Links -->
+
+    <!-- Start Code Editor CDN CSS Links -->
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/midnight.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/elegant.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
+    />
+
+    <!-- End Code Editor CDN CSS Links -->
+
+    <!-- Main Stylesheet -->
+
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <div class="chat-container">
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Type your message..." />
-        <button id="sendButton">Send</button>
+    <!-- Start Off Canvas Navbar -->
+
+    <div class="navbar" id="navbar">
+      <div class="user-profile">
+        <img src="./assets/user/LadyBot.png" alt="User Avatar" />
+        <h3 id="username">LadyBot</h3>
+      </div>
+      <ul>
+        <li>
+          <a href="#" class="active"><i class="fa-solid fa-house"></i>Home</a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-circle-info"></i>About</a>
+        </li>
+        <li>
+          <a href="#" class="submenu-toggle"
+            ><i class="fa-solid fa-code-branch"></i>Submenu
+            <i class="fa-solid fa-chevron-down"></i
+          ></a>
+          <ul class="submenu">
+            <li>
+              <a href="#"><i class="fa-solid fa-code"></i>Submenu Link</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-envelope"></i>Contact</a>
+        </li>
+      </ul>
+      <button id="lightModeToggle">
+        <i class="fa-solid fa-sun"></i> Light Mode
+      </button>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
       </div>
     </div>
+    <div class="toggle-btn" id="toggleBtn">☰</div>
+    <div class="close-btn" id="closeBtn" style="display: none">✕</div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- End Off Canvas Navbar -->
+
+    <div class="row">
+      <div class="column-left">
+        <!-- Start AI Chat Container -->
+
+        <div class="container">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input">
+            <input
+              type="text"
+              id="userInput"
+              placeholder="Type your message..."
+            />
+            <button id="sendButton" class="button">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- End AI Chat Container -->
+      </div>
+      <div class="column-right">
+        <!-- Start Code Editor Container -->
+
+        <div class="container midnight-theme">
+          <div class="controls">
+            <select id="theme-select" class="button">
+              <option class="option" value="midnight">Midnight</option>
+              <option class="option" value="elegant">Elegant</option>
+            </select>
+            <button id="run-code" class="button">
+              <i class="fa-regular fa-circle-play"></i>
+            </button>
+            <button id="clear-console" class="button">
+              <i class="fa-solid fa-broom"></i>
+            </button>
+          </div>
+          <div class="content">
+            <div class="editors">
+              <div class="editor-container">
+                <div class="editor-label-left">HTML</div>
+                <textarea id="html-editor"></textarea>
+              </div>
+              <div class="editor-container">
+                <div class="editor-label-left">CSS</div>
+                <textarea id="css-editor"></textarea>
+              </div>
+              <div class="editor-container">
+                <div class="editor-label-left">JavaScript</div>
+                <textarea id="js-editor"></textarea>
+              </div>
+            </div>
+            <div class="preview-console">
+              <div class="editor-label-right">Dev Preview</div>
+              <iframe id="preview"></iframe>
+              <div class="editor-label-right">Console</div>
+              <div id="console"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- End Code Editor Container -->
+      </div>
+    </div>
+
+    <!-- Main JS File -->
+
     <script src="./js/main.js"></script>
   </body>
 </html>

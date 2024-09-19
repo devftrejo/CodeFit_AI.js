@@ -1,0 +1,82 @@
+/* Code Editor */
+
+.content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editors {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-label-left {
+  padding: 5px;
+  border: 1px solid var(--black);
+}
+
+.editor-label-right {
+  padding: 5px;
+  background-color: var(--dark-gray);
+  border: 1px solid var(--black);
+}
+
+.CodeMirror {
+  height: 100% !important;
+}
+
+.preview-console {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#preview,
+#console {
+  flex: 1;
+  overflow: auto;
+}
+
+#preview {
+  border: 3px solid var(--dark-gray);
+  border-style: inset;
+}
+
+#console {
+  max-height: 30%;
+  background-color: var(--midnight-black);
+  color: var(--light-blue);
+  padding: 10px;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  white-space: pre-wrap;
+  border: 3px solid var(--dark-gray);
+  border-style: inset;
+}
+
+.controls {
+  padding: 10px;
+  background-color: var(--dark-gray);
+}
+
+.midnight-theme {
+  color: var(--light-blue);
+}
+
+.elegant-theme #console {
+  background-color: var(--white);
+  color: var(--black);
+}

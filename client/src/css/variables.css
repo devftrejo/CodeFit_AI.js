@@ -1,0 +1,15 @@
+/* Variables: */
+
+:root {
+  --js-yellow: #f7df1e; /* Primary */
+  --black: #000; /* Neutral/Background */
+  --semi-black: #070707; /* Neutral/Background and Text as well. */
+  --white: #fff; /* Neutral/Background */
+  --light-gray: #d3d3d3; /* Text */
+  --gray: #808080; /* Text */
+  --happy-green: #32cd32; /* Success */
+  --error-red: #ff0000; /* Error */
+  --dark-gray: #1b1b3b; /* Editor */
+  --midnight-black: #0a001f; /* Editor */
+  --light-blue: #d1edff; /* Editor */
+}
