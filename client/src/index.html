@@ -46,6 +46,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/comment/comment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
 
+    <!-- Marked -->
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <!-- Font Awesome -->
 
     <script
@@ -95,17 +99,154 @@
         <li>
           <a href="#"><i class="fa-solid fa-circle-info"></i>About</a>
         </li>
+
+        <!-- Start Curriculum -->
+
         <li>
-          <a href="#" class="submenu-toggle"
-            ><i class="fa-solid fa-code-branch"></i>Submenu
-            <i class="fa-solid fa-chevron-down"></i
-          ></a>
+          <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-book"></i> Curriculum
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
           <ul class="submenu">
             <li>
-              <a href="#"><i class="fa-solid fa-code"></i>Submenu Link</a>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-file-code"></i> HTML
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Elements"
+                    >Elements</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Attributes"
+                    >Attributes</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Forms"
+                    >Forms</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-paint-brush"></i> CSS
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Selectors"
+                    >Selectors</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Box Model"
+                    >Box Model</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Flexbox"
+                    >Flexbox</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-code"></i> JS
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Variables"
+                    >Variables</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Functions"
+                    >Functions</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Events"
+                    >Events</a
+                  >
+                </li>
+              </ul>
             </li>
           </ul>
         </li>
+
+        <!-- End Curriculum -->
+
+        <!-- Start AI Roles -->
+
+        <li>
+          <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-code-branch"></i>AI Roles
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="#" class="role-option" data-role="codeExplainer"
+                ><i class="fa-solid fa-code"></i>Code Explainer</a
+              >
+            </li>
+            <li>
+              <a href="#" class="role-option" data-role="debugger"
+                ><i class="fa-solid fa-bug"></i>Debugger</a
+              >
+            </li>
+            <li>
+              <a href="#" class="role-option" data-role="optimizationExpert"
+                ><i class="fa-solid fa-tachometer-alt"></i>Optimization
+                Expert</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- End AI Roles -->
+
         <li>
           <a href="#"><i class="fa-solid fa-envelope"></i>Contact</a>
         </li>

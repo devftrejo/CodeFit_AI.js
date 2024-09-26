@@ -58,7 +58,7 @@ body.light-mode {
   background-color: var(--midnight-black);
 }
 
-#lightModeToggle:hover,
+.light-mode #lightModeToggle:hover,
 .light-mode .navbar ul li a:hover,
 .light-mode .navbar ul li a.active {
   background-color: var(--light-blue);
@@ -101,13 +101,28 @@ body.light-mode {
   z-index: 999;
 }
 
-.submenu {
-  display: none;
-  padding-left: 20px;
+/* Submenu */
+
+ul.submenu {
+  padding: 0 20px 0 20px;
+  margin-top: 5px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, border 0.3s ease-in-out;
+  border: none;
+}
+
+.light-mode ul.submenu {
+  border-color: var(--dark-gray);
+}
+
+ul.submenu li {
+  padding: 5px 0;
 }
 
 .submenu.active {
-  display: block;
+  max-height: 500px;
+  border: 1px solid var(--js-yellow);
 }
 
 .user-profile {
@@ -119,6 +134,8 @@ body.light-mode {
 .light-mode .user-profile {
   border-bottom-color: var(--dark-gray);
 }
+
+/* User */
 
 .user-profile img {
   width: 80px;
@@ -135,6 +152,8 @@ body.light-mode {
 .light-mode #username {
   color: var(--dark-gray);
 }
+
+/* Social Links */
 
 .social-links {
   display: flex;
@@ -158,6 +177,8 @@ body.light-mode {
   text-shadow: 0 0 10px rgba(255, 255, 0, 0.2), 0 0 20px rgba(255, 255, 0, 0.2),
     0 0 30px rgba(255, 255, 0, 0.8), 0 0 40px rgba(255, 255, 0, 0.8);
 }
+
+/* LightMode Toggle */
 
 #lightModeToggle {
   background: none;

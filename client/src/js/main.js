@@ -4,20 +4,41 @@ const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");
 const sendButton = document.getElementById("sendButton");
 
+// System messages object:
+
+const systemMessages = {
+  codeExplainer:
+    "You are a JavaScript expert. Your name is 'Code Fit AI JS'. You will be provided with a piece of JavaScript code, and your task is to explain it in a concise way. After explaining the code, begin to concisely explain best practices as they relate to the code that was provided. Do not answer queries unrelated to JavaScript code. Never break character. Make sure to format your response for readability.",
+  debugger:
+    "You are an expert JavaScript debugger. Your name is 'Code Fit AI JS'. Your task is to identify and explain potential issues in the provided code, and suggest fixes. Do not answer queries unrelated to debugging JavaScript. Never break character.",
+  optimizationExpert:
+    "You are a JavaScript optimization expert. Your name is 'Code Fit AI JS'. Your role is to analyze the provided code and suggest ways to improve its performance and efficiency. After suggesting ways to improve the code's performance and efficiency, begin to concisely explain best practices as they relate to the code that was provided. Do not answer queries unrelated to JavaScript optimization. Never break character.",
+  curriculumExplainer:
+    "You are a web development instructor. Your name is 'Code Fit AI'. You will be provided with a programming language and a specific topic within that language. Your task is to provide a concise explanation of the topic and how to implement it, with a brief code example if applicable. Make your explanation suitable for beginners but informative for all levels. Do not answer queries unrelated to the topic. Never break character.",
+};
+
+// Default role:
+
+let currentRole = "codeExplainer";
+
 function addMessage(content, isUser = false) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("message");
   messageElement.classList.add(isUser ? "user-message" : "bot-message");
-  messageElement.textContent = content;
+
+  // Parse markdown and set inner HTML:
+
+  messageElement.innerHTML = marked.parse(content);
+
   chatMessages.appendChild(messageElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
   return messageElement;
 }
 
-async function sendMessage() {
-  const message = userInput.value.trim();
-  const systemMessage =
-    "You are a helpful coding assistant. Your name is 'Code Fit AI JS'. You will be provided with a piece of JavaScript code, and your task is to explain it in a concise way. Do not answer queries unrelated to code. Never break character.";
+async function sendMessage(customMessage = null) {
+  const message = customMessage || userInput.value.trim();
+  const systemMessage = systemMessages[currentRole];
+
   if (message) {
     addMessage(message, true);
     userInput.value = "";
@@ -53,8 +74,11 @@ async function sendMessage() {
             const dataStr = line.slice(6);
             if (dataStr === "[DONE]") break;
             const data = JSON.parse(dataStr);
+
+            // Parse markdown and append to the bot message:
+
             botReply += data.content;
-            botMessageElement.textContent = botReply;
+            botMessageElement.innerHTML = marked.parse(botReply);
             chatMessages.scrollTop = chatMessages.scrollHeight;
           }
         }
@@ -66,12 +90,103 @@ async function sendMessage() {
   }
 }
 
-sendButton.addEventListener("click", sendMessage);
+function updateSelectedRole(role) {
+  currentRole = role;
+
+  // Update UI to reflect the selected role:
+
+  document.querySelectorAll(".role-option").forEach((el) => {
+    el.classList.toggle("active", el.dataset.role === role);
+  });
+
+  // You can add more UI updates here, like changing a label or displaying the current role:
+
+  if (role === "codeExplainer") {
+    addMessage(`AI role changed to: Code Explainer`, false);
+    addMessage(`Copy and paste the code you want me to explain to you.`, false);
+  } else if (role === "debugger") {
+    addMessage(`AI role changed to: Debugger`, false);
+    addMessage(`Copy and paste the code you want me to help you debug.`, false);
+  } else if (role === "optimizationExpert") {
+    addMessage(`AI role changed to: Optimization Expert`, false);
+    addMessage(
+      `Copy and paste the code you want me to help you optimize.`,
+      false
+    );
+  } else if (role === "curriculumExplainer") {
+    addMessage(`AI role changed to: Curriculum Explainer`, false);
+    addMessage(
+      `Select a topic from the Curriculum menu to learn about it.`,
+      false
+    );
+  }
+}
+
+function aiIntroduction() {
+  setTimeout(() => {
+    const introMessage = `
+**Hello! I'm Code Fit AI, your personal coding assistant.**
+
+I can help you with various programming tasks, including:
+* Explaining code
+* Debugging
+* Optimization
+* Teaching web development concepts
+
+To get started, you can:
+1. Choose a role for me from the AI Roles menu.
+2. Select a topic from the Curriculum menu to learn about specific concepts.
+3. Or simply type your coding question in the chat box below.
+
+*How can I assist you today?*`;
+
+    addMessage(introMessage, false);
+  }, 1000);
+}
+
+// Event listeners:
+
+sendButton.addEventListener("click", () => sendMessage());
 userInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendMessage();
   }
 });
+
+// Add event listeners for role selection:
+
+document.querySelectorAll(".role-option").forEach((option) => {
+  option.addEventListener("click", (e) => {
+    e.preventDefault();
+    updateSelectedRole(e.currentTarget.dataset.role);
+
+    // Close the navbar after selection:
+
+    closeNavbar();
+  });
+});
+
+// Add event listeners for curriculum topic selection:
+
+document.querySelectorAll(".curriculum-topic").forEach((topicElement) => {
+  topicElement.addEventListener("click", (e) => {
+    e.preventDefault();
+    const language = e.currentTarget.dataset.language;
+    const topic = e.currentTarget.dataset.topic;
+    handleCurriculumTopicSelection(language, topic);
+    closeNavbar();
+  });
+});
+
+// Function to handle curriculum topic selection:
+
+function handleCurriculumTopicSelection(language, topic) {
+  currentRole = "curriculumExplainer";
+  updateSelectedRole(currentRole);
+
+  const message = `Explain the ${topic} topic in ${language}.`;
+  sendMessage(message);
+}
 
 // Code Editor Logic:
 
@@ -237,4 +352,10 @@ darkModeToggle.addEventListener("click", () => {
     icon.classList.replace("fa-moon", "fa-sun");
     darkModeToggle.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
   }
+});
+
+// Initialize the AI introduction message:
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  aiIntroduction();
 });

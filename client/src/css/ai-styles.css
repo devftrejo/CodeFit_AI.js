@@ -25,11 +25,38 @@
   color: var(--light-gray);
 }
 
+/* Message Formatting */
+
 .message {
   margin-bottom: 10px;
   padding: 5px 10px;
   border-radius: 3px;
   max-width: 100%;
+}
+
+.message p {
+  margin: 0 0 10px 0;
+}
+
+.message p:last-child {
+  margin-bottom: 0;
+}
+
+.message pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: var(--semi-black);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.message code {
+  background-color: var(--semi-black);
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: monospace;
 }
 
 .user-message {
@@ -42,4 +69,15 @@
   background-color: var(--semi-black);
   color: var(--light-blue);
   align-self: flex-start;
+}
+
+.light-mode .message code,
+.light-mode .message pre {
+  background-color: var(--white);
+}
+
+.message ul,
+.message ol {
+  margin: 0 0 10px 20px;
+  padding: 0;
 }
