@@ -221,6 +221,16 @@ const jsEditor = CodeMirror.fromTextArea(document.getElementById("js-editor"), {
   mode: "javascript",
 });
 
+// CodeMirror's hidden input textarea has no id/name by default — give it one
+// so DevTools doesn't flag "form field should have an id or name attribute".
+[
+  ["html", htmlEditor],
+  ["css", cssEditor],
+  ["js", jsEditor],
+].forEach(([key, editor]) => {
+  editor.getInputField().setAttribute("name", `cm-input-${key}`);
+});
+
 htmlEditor.setValue(
   "<!DOCTYPE html>\n<html>\n<head>\n  <title>Live Preview</title>\n</head>\n<body>\n  <h1>Hello, World!</h1>\n</body>\n</html>"
 );
