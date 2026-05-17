@@ -1,2 +1,5 @@
+# Installed npm dependencies
 node_modules
+
+# Local secrets (OPENAI_API_KEY, etc.) — never commit
 .env
