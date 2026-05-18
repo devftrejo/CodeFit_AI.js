@@ -39,66 +39,94 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 
 #### NOTE: This can change at any time during the project's growth and development.
 
+## Repository Layout
+
+This repo is an **npm workspace** with two packages:
+
+```
+client/   Vite SPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
+server/   Express API — single POST / endpoint that streams OpenAI chat completions
+```
+
+All dependencies for both packages hoist to a single root `node_modules/`, so you install once at the root.
+
 ## Getting Started
 
-To get a local copy up and running follow these steps:
+### Prerequisites
 
-### Installation Instructions for the First Time Cloning the Project
+Make sure a current Node.js LTS and npm are available:
 
-#### Prerequisites
+```sh
+node -v
+npm -v
+```
 
-1. Ensure the latest verions of Node.js LTS & NPM are installed on your machine:
-   - Check Node.js Version
-     ```sh
-     node -v
-     ```
-   - Check NPM Version
+If either is missing or out of date, install or update Node from [nodejs.org](https://nodejs.org).
 
-     ```sh
-     npm -v
-     ```
+### Initial Setup
 
-     - Based on your version check, you should use your preferred method of updating Node.js and/or NPM, if needed.
+1. **Clone the repository**:
 
-2. Clone the repository:
-   - Git Clone
-     ```sh
-     git clone "repository-url"
+   ```sh
+   git clone "repository-url"
+   ```
+
+   (replace `"repository-url"` with the actual URL).
+
+2. **Install dependencies from the repo root** — one command installs both packages:
+
+   ```sh
+   npm install
+   ```
+
+3. **Add your environment files**:
+   - `server/.env` — **required**. Holds your `OPENAI_API_KEY`. Without it the `POST /` endpoint returns 500:
+
      ```
-     (This repository's URL goes in the quotes).
-3. Use your preferred method to navigate into each of the project's directories (Client & Server) and then install the project's dependencies in each:
-   - NPM Install
-     ```
-     npm install
-     ```
-4. Start Vite's dev server (Client):
-   - Dev Server
-     ```
-     npm run dev
-     ```
-5. Start express server w/ Nodemon (Server):
-   - Express Server
-     ```
-     npm run watch
+     OPENAI_API_KEY=sk-...
      ```
 
-#### Development
+   - `client/.env` — optional. Only needed if your server runs somewhere other than `http://localhost:3000/`. Copy `client/.env.example` and edit `VITE_API_URL`.
 
-1. Make sure to update your working tree with a pull each time you start work on the project.
-   - Git Pull
-     ```
-     git pull
-     ```
-2. To make a production build, preview it, and push new changes (Client ONLY):
-   - NPM Build
-     ```
-     npm run build
-     ```
-   - NPM Preview
-     ```
-     npm run preview
-     ```
-3. Use your preferred method for pushing new changes to the repository (VSCode UI or CLI).
+### Day-to-Day Development
+
+Always pull before starting work:
+
+```sh
+git pull
+```
+
+Start both the Vite client (port **8080**) and the Express server (port **3000**) with a single command from the repo root:
+
+```sh
+npm run dev
+```
+
+To run only one side independently:
+
+```sh
+npm run dev -w client      # Vite client only
+npm run watch -w server    # Nodemon-restarted Express server only
+```
+
+### Formatting & Linting
+
+Prettier and ESLint are wired up at the repo root. Run before committing:
+
+```sh
+npm run format         # write formatting changes
+npm run format:check   # check without writing
+npm run lint           # ESLint over client/ and server/
+```
+
+### Production Build & Preview
+
+```sh
+npm run build     # builds client/ to client/dist/
+npm run preview   # serves the built client locally
+```
+
+Pushing changes: use your preferred Git workflow (VSCode UI or CLI).
 
 ## Usage Instructions
 
