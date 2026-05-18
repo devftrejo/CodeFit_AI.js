@@ -3,6 +3,8 @@ import { config } from "dotenv";
 import cors from "cors";
 import { OpenAI } from "openai";
 
+import { systemMessages } from "./prompts.js";
+
 config();
 const app = express();
 app.use(cors());
@@ -13,16 +15,24 @@ const openai = new OpenAI({
 });
 
 app.post("/", async (req, res) => {
+  const { message, role } = req.body;
+
+  if (typeof message !== "string" || !message.trim()) {
+    return res.status(400).json({ error: "`message` is required." });
+  }
+
+  const systemMessage = systemMessages[role];
+  if (!systemMessage) {
+    return res.status(400).json({
+      error: `Unknown role: ${role}. Known roles: ${Object.keys(systemMessages).join(", ")}`,
+    });
+  }
+
   try {
-    const { message, systemMessage } = req.body;
     const stream = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content:
-            systemMessage || "Say that you need context to provide an answer.",
-        },
+        { role: "system", content: systemMessage },
         { role: "user", content: message },
       ],
       stream: true,

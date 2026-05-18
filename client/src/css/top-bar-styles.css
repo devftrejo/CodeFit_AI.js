@@ -1,0 +1,81 @@
+/* Shared Top Bar (appears on every page) */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 0 60px;
+  height: 56px;
+  flex-shrink: 0;
+  background-color: var(--dark-gray);
+  border-bottom: 1px solid var(--js-yellow);
+  z-index: 500;
+}
+
+.light-mode .top-bar {
+  background-color: var(--white);
+  border-bottom-color: var(--dark-gray);
+}
+
+.top-bar-brand {
+  font-family: "Share Tech", sans-serif;
+  font-size: 20px;
+  color: var(--js-yellow);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.top-bar-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.top-bar-nav a {
+  color: var(--light-gray);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 3px;
+  transition: 0.2s;
+}
+
+.light-mode .top-bar-nav a {
+  color: var(--dark-gray);
+}
+
+.top-bar-nav a:hover {
+  background-color: var(--midnight-black);
+}
+
+.light-mode .top-bar-nav a:hover {
+  background-color: var(--light-blue);
+}
+
+.top-bar-nav a.active {
+  color: var(--js-yellow);
+}
+
+#top-bar-light-toggle {
+  background: none;
+  border: 1px solid var(--js-yellow);
+  color: var(--light-gray);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 3px;
+  transition: 0.2s;
+}
+
+.light-mode #top-bar-light-toggle {
+  color: var(--dark-gray);
+  border-color: var(--dark-gray);
+}
+
+#top-bar-light-toggle:hover {
+  background-color: var(--midnight-black);
+}
+
+.light-mode #top-bar-light-toggle:hover {
+  background-color: var(--light-blue);
+}

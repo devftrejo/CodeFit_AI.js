@@ -44,11 +44,20 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 This repo is an **npm workspace** with two packages:
 
 ```
-client/   Vite SPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
-server/   Express API — single POST / endpoint that streams OpenAI chat completions
+client/   Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
+server/   Express API — single POST / endpoint that streams OpenAI chat completions; owns the AI system prompts
 ```
 
 All dependencies for both packages hoist to a single root `node_modules/`, so you install once at the root.
+
+The client ships four pages:
+
+- `/` — landing
+- `/app.html` — the chat + code-sandbox app
+- `/about.html` — about
+- `/contact.html` — contact
+
+All four share a top-bar nav. The chat app additionally has an off-canvas navbar for the Curriculum and AI Roles menus.
 
 ## Getting Started
 

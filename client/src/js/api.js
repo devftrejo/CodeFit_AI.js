@@ -3,11 +3,11 @@
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/";
 
-export async function streamChat({ message, systemMessage, onChunk }) {
+export async function streamChat({ message, role, onChunk }) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, systemMessage }),
+    body: JSON.stringify({ message, role }),
   });
 
   if (!response.ok) {

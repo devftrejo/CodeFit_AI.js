@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>App · CodeFit_AI.js</title>
+
+    <!-- Google Fonts -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Shared Top Bar -->
+
+    <header class="top-bar">
+      <a href="/" class="top-bar-brand">CodeFit_AI.js</a>
+      <nav class="top-bar-nav">
+        <a href="/">Home</a>
+        <a href="/app.html">App</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <button id="top-bar-light-toggle"></button>
+      </nav>
+    </header>
+
+    <!-- Off Canvas Navbar (app-only: Curriculum + AI Roles) -->
+
+    <div class="navbar" id="navbar">
+      <div class="user-profile">
+        <img src="./assets/user/LadyBot.png" alt="User Avatar" />
+        <h3 id="username">LadyBot</h3>
+      </div>
+      <ul>
+        <!-- Curriculum -->
+
+        <li>
+          <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-book"></i> Curriculum
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-file-code"></i> HTML
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Elements"
+                    >Elements</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Attributes"
+                    >Attributes</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="HTML"
+                    data-topic="Forms"
+                    >Forms</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-paint-brush"></i> CSS
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Selectors"
+                    >Selectors</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Box Model"
+                    >Box Model</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="CSS"
+                    data-topic="Flexbox"
+                    >Flexbox</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#" class="submenu-toggle">
+                <i class="fa-solid fa-code"></i> JS
+                <i class="fa-solid fa-chevron-down"></i>
+              </a>
+              <ul class="submenu">
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Variables"
+                    >Variables</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Functions"
+                    >Functions</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="curriculum-topic"
+                    data-language="JavaScript"
+                    data-topic="Events"
+                    >Events</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <!-- AI Roles -->
+
+        <li>
+          <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-code-branch"></i>AI Roles
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="#" class="role-option" data-role="codeExplainer"
+                ><i class="fa-solid fa-code"></i>Code Explainer</a
+              >
+            </li>
+            <li>
+              <a href="#" class="role-option" data-role="debugger"
+                ><i class="fa-solid fa-bug"></i>Debugger</a
+              >
+            </li>
+            <li>
+              <a href="#" class="role-option" data-role="optimizationExpert"
+                ><i class="fa-solid fa-tachometer-alt"></i>Optimization
+                Expert</a
+              >
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="toggle-btn" id="toggleBtn">☰</div>
+    <div class="close-btn" id="closeBtn" style="display: none">✕</div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="row">
+      <div class="column-left">
+        <div class="container">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input">
+            <input
+              type="text"
+              id="userInput"
+              placeholder="Type your message..."
+            />
+            <button id="sendButton" class="button">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="column-right">
+        <div class="container midnight-theme">
+          <div class="controls">
+            <select id="theme-select" class="button">
+              <option class="option" value="midnight">Midnight</option>
+              <option class="option" value="elegant">Elegant</option>
+            </select>
+            <button id="run-code" class="button">
+              <i class="fa-regular fa-circle-play"></i>
+            </button>
+            <button id="clear-console" class="button">
+              <i class="fa-solid fa-broom"></i>
+            </button>
+          </div>
+          <div class="content">
+            <div class="editors">
+              <div class="editor-container">
+                <div class="editor-label-left">HTML</div>
+                <div id="html-editor" class="editor-host"></div>
+              </div>
+              <div class="editor-container">
+                <div class="editor-label-left">CSS</div>
+                <div id="css-editor" class="editor-host"></div>
+              </div>
+              <div class="editor-container">
+                <div class="editor-label-left">JavaScript</div>
+                <div id="js-editor" class="editor-host"></div>
+              </div>
+            </div>
+            <div class="preview-console">
+              <div class="editor-label-right">Dev Preview</div>
+              <iframe id="preview" title="Live preview"></iframe>
+              <div class="editor-label-right">Console</div>
+              <div id="console"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/entries/app.js"></script>
+  </body>
+</html>

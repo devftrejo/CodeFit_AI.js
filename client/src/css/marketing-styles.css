@@ -1,0 +1,154 @@
+/* Marketing pages (landing, about, contact) */
+
+.marketing-page {
+  flex: 1;
+  overflow-y: auto;
+  color: var(--light-gray);
+}
+
+.light-mode .marketing-page {
+  color: var(--semi-black);
+}
+
+.marketing-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.hero {
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: "Share Tech", sans-serif;
+  font-size: 48px;
+  margin: 0 0 16px;
+  color: var(--js-yellow);
+}
+
+.hero p.tagline {
+  font-size: 20px;
+  margin: 0 0 32px;
+  color: var(--light-gray);
+}
+
+.light-mode .hero p.tagline {
+  color: var(--dark-gray);
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: var(--js-yellow);
+  color: var(--black);
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 8px 0 rgba(255, 255, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.cta-button:hover {
+  box-shadow:
+    0 8px 16px 0 rgba(255, 255, 0, 0.2),
+    0 0 10px 2px rgba(255, 255, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+.value-props {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.value-prop {
+  padding: 24px;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  background-color: var(--dark-gray);
+  transition: 0.3s;
+}
+
+.light-mode .value-prop {
+  background-color: var(--white);
+}
+
+.value-prop:hover {
+  box-shadow:
+    0 8px 16px 0 rgba(255, 255, 0, 0.2),
+    0 0 10px 2px rgba(255, 255, 0, 0.8);
+}
+
+.value-prop i {
+  font-size: 28px;
+  color: var(--js-yellow);
+  margin-bottom: 12px;
+}
+
+.value-prop h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--light-gray);
+}
+
+.light-mode .value-prop h3 {
+  color: var(--dark-gray);
+}
+
+.value-prop p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gray);
+}
+
+.marketing-section h2 {
+  font-family: "Share Tech", sans-serif;
+  font-size: 32px;
+  color: var(--js-yellow);
+  margin: 0 0 16px;
+}
+
+.marketing-section p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.contact-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: var(--dark-gray);
+  color: var(--light-gray);
+  text-decoration: none;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  transition: 0.2s;
+}
+
+.light-mode .contact-links a {
+  background-color: var(--white);
+  color: var(--dark-gray);
+}
+
+.contact-links a:hover {
+  background-color: var(--midnight-black);
+  color: var(--js-yellow);
+}
+
+.light-mode .contact-links a:hover {
+  background-color: var(--light-blue);
+}
