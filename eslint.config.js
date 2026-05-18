@@ -13,9 +13,6 @@ export default [
       sourceType: "module",
       globals: {
         ...globals.browser,
-        // CDN-loaded libraries (CodeMirror 5, marked) — migrated to npm in PR 2
-        CodeMirror: "readonly",
-        marked: "readonly",
       },
     },
   },

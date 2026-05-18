@@ -1,77 +1,73 @@
-// CodeMirror 5 is loaded as a global from the CDN (see index.html); declared
-// in eslint.config.js. Migrated to npm + CodeMirror 6 in PR 2.
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState, Compartment } from "@codemirror/state";
+import { keymap } from "@codemirror/view";
+import { foldCode } from "@codemirror/language";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { javascript } from "@codemirror/lang-javascript";
+import { oneDark } from "@codemirror/theme-one-dark";
 
-const editorOptions = {
-  lineNumbers: true,
-  theme: "midnight",
-  autoCloseBrackets: true,
-  matchBrackets: true,
-  foldGutter: true,
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-  styleActiveLine: true,
-  lineWrapping: true,
-  rulers: [{ color: "#445", column: 80, lineStyle: "dashed" }],
-  extraKeys: {
-    "Ctrl-Q": function (cm) {
-      cm.foldCode(cm.getCursor());
-    },
-    "Ctrl-/": "toggleComment",
-  },
-};
+// One Compartment instance lets us reconfigure the theme on all three editors
+// from a single source of truth (see changeTheme below).
+const themeCompartment = new Compartment();
 
-const htmlEditor = CodeMirror.fromTextArea(
-  document.getElementById("html-editor"),
-  { ...editorOptions, mode: "htmlmixed" }
-);
-const cssEditor = CodeMirror.fromTextArea(
-  document.getElementById("css-editor"),
-  { ...editorOptions, mode: "css" }
-);
-const jsEditor = CodeMirror.fromTextArea(document.getElementById("js-editor"), {
-  ...editorOptions,
-  mode: "javascript",
+const updatePreviewListener = EditorView.updateListener.of((update) => {
+  if (update.docChanged) updatePreview();
 });
 
-// CodeMirror's hidden input textarea has no id/name by default — give it one
-// so DevTools doesn't flag "form field should have an id or name attribute".
-[
-  ["html", htmlEditor],
-  ["css", cssEditor],
-  ["js", jsEditor],
-].forEach(([key, editor]) => {
-  editor.getInputField().setAttribute("name", `cm-input-${key}`);
+function makeEditor({ parent, language, doc, watchForPreview = false }) {
+  return new EditorView({
+    state: EditorState.create({
+      doc,
+      extensions: [
+        basicSetup,
+        language,
+        EditorView.lineWrapping,
+        keymap.of([{ key: "Ctrl-q", run: foldCode }]),
+        themeCompartment.of(oneDark),
+        ...(watchForPreview ? [updatePreviewListener] : []),
+      ],
+    }),
+    parent,
+  });
+}
+
+const htmlEditor = makeEditor({
+  parent: document.getElementById("html-editor"),
+  language: html(),
+  doc: "<!DOCTYPE html>\n<html>\n<head>\n  <title>Live Preview</title>\n</head>\n<body>\n  <h1>Hello, World!</h1>\n</body>\n</html>",
+  watchForPreview: true,
 });
 
-htmlEditor.setValue(
-  "<!DOCTYPE html>\n<html>\n<head>\n  <title>Live Preview</title>\n</head>\n<body>\n  <h1>Hello, World!</h1>\n</body>\n</html>"
-);
-cssEditor.setValue(
-  "body {\n  font-family: Arial, sans-serif;\n  background-color: #f0f0f0;\n}\n\nh1 {\n  color: #333;\n}"
-);
-jsEditor.setValue("console.log('Hello from JavaScript!');");
+const cssEditor = makeEditor({
+  parent: document.getElementById("css-editor"),
+  language: css(),
+  doc: "body {\n  font-family: Arial, sans-serif;\n  background-color: #f0f0f0;\n}\n\nh1 {\n  color: #333;\n}",
+  watchForPreview: true,
+});
+
+const jsEditor = makeEditor({
+  parent: document.getElementById("js-editor"),
+  language: javascript(),
+  doc: "console.log('Hello from JavaScript!');",
+});
 
 const themeSelect = document.getElementById("theme-select");
 const runCodeButton = document.getElementById("run-code");
 const clearConsoleButton = document.getElementById("clear-console");
 const consoleElement = document.getElementById("console");
+const previewFrame = document.getElementById("preview");
 
 function updatePreview() {
-  const html = htmlEditor.getValue();
-  const css = cssEditor.getValue();
-  const js = jsEditor.getValue();
-
-  const previewFrame = document.getElementById("preview");
-  const previewContent = `
-      ${html}
-      <style>${css}</style>
-      <script>${js}</script>
+  previewFrame.srcdoc = `
+      ${htmlEditor.state.doc.toString()}
+      <style>${cssEditor.state.doc.toString()}</style>
+      <script>${jsEditor.state.doc.toString()}</script>
   `;
-
-  previewFrame.srcdoc = previewContent;
 }
 
 function runCode() {
-  const js = jsEditor.getValue();
+  const js = jsEditor.state.doc.toString();
   const oldLog = console.log;
   const logs = [];
 
@@ -100,9 +96,10 @@ function clearConsole() {
 
 function changeTheme() {
   const theme = themeSelect.value;
+  // "Elegant" = CM6's default light look (no theme extension applied).
+  const themeExt = theme === "elegant" ? [] : oneDark;
   [htmlEditor, cssEditor, jsEditor].forEach((editor) => {
-    editor.setOption("theme", theme);
-    editor.refresh();
+    editor.dispatch({ effects: themeCompartment.reconfigure(themeExt) });
   });
 
   if (theme === "midnight") {
@@ -114,8 +111,6 @@ function changeTheme() {
   }
 }
 
-htmlEditor.on("change", updatePreview);
-cssEditor.on("change", updatePreview);
 runCodeButton.addEventListener("click", runCode);
 clearConsoleButton.addEventListener("click", clearConsole);
 themeSelect.addEventListener("change", changeTheme);

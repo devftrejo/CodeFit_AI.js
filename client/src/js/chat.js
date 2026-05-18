@@ -1,5 +1,4 @@
-// marked is loaded as a global from the CDN (see index.html); declared in
-// eslint.config.js. Migrated to npm in PR 2.
+import { marked } from "marked";
 
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";

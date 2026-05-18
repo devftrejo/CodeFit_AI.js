@@ -1,7 +1,7 @@
-// Thin wrapper around the streaming chat endpoint. Replace API_URL with a
-// VITE_API_URL env var in PR 2 once CDN libs are migrated off.
+// Thin wrapper around the streaming chat endpoint.
+// VITE_API_URL is set in client/.env (see .env.example).
 
-const API_URL = "http://localhost:3000/";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/";
 
 export async function streamChat({ message, systemMessage, onChunk }) {
   const response = await fetch(API_URL, {

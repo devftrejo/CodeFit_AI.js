@@ -1,2 +1,6 @@
 # Installed npm dependencies
 node_modules
+
+# Local Vite env (VITE_API_URL, etc.) — commit .env.example, not .env
+.env
+.env.local

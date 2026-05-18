@@ -27,59 +27,8 @@
 
     <!-- End Google Fonts -->
 
-    <!-- Start Code Editor CDN JS Links -->
-
-    <!-- Code Mirror -->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/brace-fold.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/xml-fold.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/comment-fold.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/comment/comment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
-
-    <!-- Marked -->
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- End Code Editor CDN JS Links -->
-
-    <!-- Start Code Editor CDN CSS Links -->
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/midnight.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/elegant.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css"
-    />
-
-    <!-- End Code Editor CDN CSS Links -->
-
-    <!-- Font Awesome (Free, public CDN — no domain lock) -->
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
-
-    <!-- Main Stylesheet -->
+    <!-- Main Stylesheet (CodeMirror, marked, and Font Awesome are now
+         imported from npm via the JS modules below) -->
 
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
@@ -304,15 +253,15 @@
             <div class="editors">
               <div class="editor-container">
                 <div class="editor-label-left">HTML</div>
-                <textarea id="html-editor"></textarea>
+                <div id="html-editor" class="editor-host"></div>
               </div>
               <div class="editor-container">
                 <div class="editor-label-left">CSS</div>
-                <textarea id="css-editor"></textarea>
+                <div id="css-editor" class="editor-host"></div>
               </div>
               <div class="editor-container">
                 <div class="editor-label-left">JavaScript</div>
-                <textarea id="js-editor"></textarea>
+                <div id="js-editor" class="editor-host"></div>
               </div>
             </div>
             <div class="preview-console">
