@@ -23,7 +23,9 @@ body {
   font-style: normal;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .row {
@@ -54,7 +56,8 @@ body {
 }
 
 .container:hover {
-  box-shadow: 0 8px 16px 0 rgba(255, 255, 0, 0.2),
+  box-shadow:
+    0 8px 16px 0 rgba(255, 255, 0, 0.2),
     0 0 10px 2px rgba(255, 255, 0, 0.8);
 }
 
@@ -74,7 +77,8 @@ body {
 }
 
 .button:hover {
-  box-shadow: 0 8px 16px 0 rgba(255, 255, 0, 0.2),
+  box-shadow:
+    0 8px 16px 0 rgba(255, 255, 0, 0.2),
     0 0 10px 2px rgba(255, 255, 0, 0.8);
   transform: translateY(2px);
 }

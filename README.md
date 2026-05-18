@@ -53,10 +53,13 @@ To get a local copy up and running follow these steps:
      node -v
      ```
    - Check NPM Version
+
      ```sh
      npm -v
      ```
+
      - Based on your version check, you should use your preferred method of updating Node.js and/or NPM, if needed.
+
 2. Clone the repository:
    - Git Clone
      ```sh

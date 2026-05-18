@@ -30,7 +30,8 @@ body.light-mode {
 }
 
 .navbar:hover {
-  box-shadow: 0 8px 16px 0 rgba(255, 255, 0, 0.2),
+  box-shadow:
+    0 8px 16px 0 rgba(255, 255, 0, 0.2),
     0 0 10px 2px rgba(255, 255, 0, 0.8);
 }
 
@@ -108,7 +109,9 @@ ul.submenu {
   margin-top: 5px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-in-out, border 0.3s ease-in-out;
+  transition:
+    max-height 0.3s ease-in-out,
+    border 0.3s ease-in-out;
   border: none;
 }
 
@@ -174,8 +177,11 @@ ul.submenu li {
 
 .social-links a:hover {
   color: var(--js-yellow);
-  text-shadow: 0 0 10px rgba(255, 255, 0, 0.2), 0 0 20px rgba(255, 255, 0, 0.2),
-    0 0 30px rgba(255, 255, 0, 0.8), 0 0 40px rgba(255, 255, 0, 0.8);
+  text-shadow:
+    0 0 10px rgba(255, 255, 0, 0.2),
+    0 0 20px rgba(255, 255, 0, 0.2),
+    0 0 30px rgba(255, 255, 0, 0.8),
+    0 0 40px rgba(255, 255, 0, 0.8);
 }
 
 /* LightMode Toggle */

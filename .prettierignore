@@ -1,0 +1,14 @@
+# Installed npm dependencies
+node_modules
+
+# Build output
+dist
+
+# Lockfiles — managed by npm
+package-lock.json
+
+# Git internals
+.git
+
+# Local secrets
+.env

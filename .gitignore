@@ -1,2 +1,8 @@
 # Claude Code instructions (local dev tool, not part of project deliverables)
 CLAUDE.md
+
+# Installed npm dependencies (hoisted to repo root by npm workspaces)
+node_modules
+
+# Vite production build output
+client/dist

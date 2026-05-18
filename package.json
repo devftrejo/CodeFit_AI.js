@@ -1,0 +1,28 @@
+{
+  "name": "codefit_ai.js",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "${DarkMode} Devs' online AI bootcamp — root workspace for the Vite client and Express server.",
+  "author": "Fernando Trejo",
+  "license": "UNLICENSED",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n client,server -c yellow,cyan \"npm run dev -w client\" \"npm run watch -w server\"",
+    "build": "npm run build -w client",
+    "preview": "npm run preview -w client",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "eslint": "^9.18.0",
+    "@eslint/js": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
+  }
+}
