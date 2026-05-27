@@ -6,3 +6,16 @@ node_modules
 
 # Vite production build output
 client/dist
+
+# Firebase CLI deploy cache
+.firebase
+
+# Firebase CLI debug logs
+firebase-debug.log
+firebase-debug.*.log
+
+# Firebase Agent Skills (local AI tooling, not part of project deliverables)
+.agents
+
+# Firebase Agent Skills lockfile (paired with .agents/, also local-only)
+skills-lock.json

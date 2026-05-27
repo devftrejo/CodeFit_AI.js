@@ -12,3 +12,12 @@ package-lock.json
 
 # Local secrets
 .env
+
+# Firebase Agent Skills — vendored content, not ours to reformat
+.agents
+
+# Firebase-generated config (JSONC with comments, not strict JSON)
+firestore.indexes.json
+
+# Firebase CLI deploy cache
+.firebase

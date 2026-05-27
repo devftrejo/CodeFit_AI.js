@@ -36,4 +36,14 @@ export default [
       },
     },
   },
+  {
+    files: ["functions/**/*.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ];

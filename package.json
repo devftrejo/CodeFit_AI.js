@@ -8,12 +8,15 @@
   "license": "UNLICENSED",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "functions"
   ],
   "scripts": {
     "dev": "concurrently -n client,server -c yellow,cyan \"npm run dev -w client\" \"npm run watch -w server\"",
     "build": "npm run build -w client",
     "preview": "npm run preview -w client",
+    "emulators": "firebase emulators:start",
+    "firebase:deploy": "npm run build && firebase deploy",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint ."
