@@ -1,4 +1,5 @@
 import { getTheme, toggleTheme } from "./theme.js";
+import { onAuthChange, signOut } from "./auth.js";
 
 // Highlights the current page in the top-bar nav (matches the link whose href
 // resolves to the current pathname). Defaults to index.html for `/`.
@@ -28,5 +29,52 @@ function bindLightToggle() {
   document.addEventListener("themechange", render);
 }
 
+// Render the auth slot based on the current Firebase user. Re-renders whenever
+// auth state changes (sign-in, sign-out, token refresh that adds claims).
+function bindAuthSlot() {
+  const slot = document.getElementById("top-bar-auth");
+  if (!slot) return;
+
+  slot.classList.add("top-bar-auth");
+
+  const renderSignedIn = (user) => {
+    slot.innerHTML = "";
+    const label = document.createElement("span");
+    label.className = "top-bar-auth-email";
+    label.textContent = user.email || user.displayName || "Signed in";
+    label.title = user.email || "";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "top-bar-auth-button";
+    button.textContent = "Sign out";
+    button.addEventListener("click", async () => {
+      try {
+        await signOut();
+        // After sign-out, kick the user back to the landing page so anyone
+        // logged out of app.html doesn't stare at an empty, gated UI.
+        window.location.replace("/");
+      } catch (error) {
+        console.error("Sign-out failed:", error);
+      }
+    });
+    slot.append(label, button);
+  };
+
+  const renderSignedOut = () => {
+    slot.innerHTML = "";
+    const link = document.createElement("a");
+    link.className = "top-bar-auth-link";
+    link.href = "/sign-in.html";
+    link.textContent = "Sign in";
+    slot.append(link);
+  };
+
+  onAuthChange((user) => {
+    if (user) renderSignedIn(user);
+    else renderSignedOut();
+  });
+}
+
 markActiveLink();
 bindLightToggle();
+bindAuthSlot();

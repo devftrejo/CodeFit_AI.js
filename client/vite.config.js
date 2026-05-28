@@ -16,6 +16,7 @@ export default defineConfig({
         app: resolve(__dirname, "src/app.html"),
         about: resolve(__dirname, "src/about.html"),
         contact: resolve(__dirname, "src/contact.html"),
+        signIn: resolve(__dirname, "src/sign-in.html"),
       },
     },
   },

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sign in · CodeFit_AI.js</title>
+
+    <!-- Google Fonts -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <a href="/" class="top-bar-brand">CodeFit_AI.js</a>
+      <nav class="top-bar-nav">
+        <a href="/">Home</a>
+        <a href="/app.html">App</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <div id="top-bar-auth"></div>
+        <button id="top-bar-light-toggle"></button>
+      </nav>
+    </header>
+
+    <main class="marketing-page">
+      <section class="marketing-section auth-section">
+        <div class="auth-card">
+          <div class="auth-tabs" role="tablist">
+            <button
+              type="button"
+              class="auth-tab active"
+              data-mode="sign-in"
+              role="tab"
+              aria-selected="true"
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              class="auth-tab"
+              data-mode="sign-up"
+              role="tab"
+              aria-selected="false"
+            >
+              Create account
+            </button>
+          </div>
+
+          <form id="auth-form" class="auth-form" novalidate>
+            <label class="auth-label" for="auth-email">Email</label>
+            <input
+              id="auth-email"
+              type="email"
+              autocomplete="email"
+              required
+              class="auth-input"
+            />
+
+            <label class="auth-label" for="auth-password">Password</label>
+            <input
+              id="auth-password"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="6"
+              class="auth-input"
+            />
+
+            <p
+              id="auth-error"
+              class="auth-error"
+              role="alert"
+              aria-live="polite"
+            ></p>
+
+            <button id="auth-submit" type="submit" class="auth-submit">
+              Sign in
+            </button>
+          </form>
+
+          <div class="auth-divider"><span>or</span></div>
+
+          <button id="auth-google" type="button" class="auth-google">
+            <i class="fa-brands fa-google"></i>
+            Continue with Google
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./js/entries/sign-in.js"></script>
+  </body>
+</html>

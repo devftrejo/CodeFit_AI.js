@@ -12,7 +12,7 @@
     "functions"
   ],
   "scripts": {
-    "dev": "concurrently -n client,functions -c yellow,cyan \"npm run dev -w client\" \"firebase emulators:start --only functions\"",
+    "dev": "concurrently -n client,emulators -c yellow,cyan \"npm run dev -w client\" \"firebase emulators:start --only functions,auth\"",
     "dev:legacy": "concurrently -n client,server -c yellow,cyan \"npm run dev -w client\" \"npm run watch -w server\"",
     "build": "npm run build -w client",
     "preview": "npm run preview -w client",

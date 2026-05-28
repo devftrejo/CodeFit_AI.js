@@ -1,15 +1,26 @@
 // Cloud Functions for CodeFit_AI.js — the chat HTTPS handler.
 // Ported from server/server.js. Streams OpenAI completions as SSE,
 // same wire format as before (`data: {"content": "..."}\n\n` then `data: [DONE]`).
+// Phase 3 added Firebase Auth verification — every request must carry a
+// valid Firebase ID token in `Authorization: Bearer <token>`.
 
 import { setGlobalOptions } from "firebase-functions";
 import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
+import { initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { OpenAI } from "openai";
 
 import { systemMessages } from "./prompts.js";
 
 setGlobalOptions({ maxInstances: 10 });
+
+// Admin SDK init runs once at module load. In the emulator it auto-connects
+// to the Auth emulator via the FIREBASE_AUTH_EMULATOR_HOST env var that the
+// Firebase emulators set automatically; in prod it uses the Functions service
+// account credentials.
+initializeApp();
+const adminAuth = getAuth();
 
 // OPENAI_API_KEY is held in Secret Manager (Phase 0:
 // `firebase functions:secrets:set OPENAI_API_KEY`). In the emulator it
@@ -33,6 +44,31 @@ export const chat = onRequest(
         .json({ error: "Method not allowed" });
       return;
     }
+
+    const authHeader = req.get("Authorization") || "";
+    const tokenMatch = authHeader.match(/^Bearer (.+)$/);
+    if (!tokenMatch) {
+      res
+        .status(401)
+        .json({ error: "Missing or malformed Authorization header" });
+      return;
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = await adminAuth.verifyIdToken(tokenMatch[1]);
+    } catch (error) {
+      console.warn(
+        "ID token verification failed:",
+        error.code || error.message
+      );
+      res.status(401).json({ error: "Invalid or expired auth token" });
+      return;
+    }
+
+    // decodedToken.uid is captured here; Phase 4–5 use it to persist messages
+    // under users/{uid}/conversations/...
+    void decodedToken;
 
     const { message, role } = req.body ?? {};
 

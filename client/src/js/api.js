@@ -4,17 +4,27 @@
 //   - in prod, Firebase Hosting rewrites to the chat Cloud Function
 // Set VITE_API_URL in client/.env only to override (e.g. non-Firebase deploy).
 
+import { getIdToken } from "./auth.js";
+
 const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 
 export async function streamChat({ message, role, onChunk }) {
+  const token = await getIdToken();
+  if (!token) {
+    throw new Error("Not signed in.");
+  }
+
   const response = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ message, role }),
   });
 
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error(`Chat request failed: ${response.status}`);
   }
 
   const reader = response.body.getReader();

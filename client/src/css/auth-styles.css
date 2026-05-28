@@ -1,0 +1,240 @@
+/* Auth: sign-in page form + top-bar auth UI on every page */
+
+/* Sign-in page card */
+
+.auth-section {
+  max-width: 420px;
+}
+
+.auth-card {
+  padding: 32px;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  background-color: var(--dark-gray);
+}
+
+.light-mode .auth-card {
+  background-color: var(--white);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--gray);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--gray);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.auth-tab:hover {
+  color: var(--light-gray);
+}
+
+.light-mode .auth-tab:hover {
+  color: var(--dark-gray);
+}
+
+.auth-tab.active {
+  color: var(--js-yellow);
+  border-bottom-color: var(--js-yellow);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-label {
+  font-size: 13px;
+  color: var(--light-gray);
+}
+
+.light-mode .auth-label {
+  color: var(--dark-gray);
+}
+
+.auth-input {
+  padding: 10px 12px;
+  background-color: var(--midnight-black);
+  border: 1px solid var(--gray);
+  border-radius: 3px;
+  color: var(--light-gray);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.light-mode .auth-input {
+  background-color: var(--light-blue);
+  color: var(--dark-gray);
+  border-color: var(--dark-gray);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--js-yellow);
+}
+
+.auth-error {
+  min-height: 18px;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--error-red);
+}
+
+.auth-submit {
+  margin-top: 8px;
+  padding: 12px;
+  background-color: var(--js-yellow);
+  color: var(--black);
+  border: none;
+  border-radius: 3px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.auth-submit:hover:not(:disabled) {
+  box-shadow:
+    0 4px 8px 0 rgba(255, 255, 0, 0.2),
+    0 0 6px 1px rgba(255, 255, 0, 0.6);
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+  color: var(--gray);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--gray);
+}
+
+.auth-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--midnight-black);
+  color: var(--light-gray);
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.light-mode .auth-google {
+  background-color: var(--white);
+  color: var(--dark-gray);
+}
+
+.auth-google:hover:not(:disabled) {
+  background-color: var(--dark-gray);
+}
+
+.light-mode .auth-google:hover:not(:disabled) {
+  background-color: var(--light-blue);
+}
+
+.auth-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-google i {
+  font-size: 16px;
+}
+
+/* Top-bar auth slot (rendered by top-bar.js on every page) */
+
+.top-bar-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-bar-auth-email {
+  font-size: 13px;
+  color: var(--light-gray);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.light-mode .top-bar-auth-email {
+  color: var(--dark-gray);
+}
+
+.top-bar-auth-button {
+  background: none;
+  border: 1px solid var(--js-yellow);
+  color: var(--light-gray);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: inherit;
+}
+
+.light-mode .top-bar-auth-button {
+  color: var(--dark-gray);
+}
+
+.top-bar-auth-button:hover {
+  background-color: var(--midnight-black);
+}
+
+.light-mode .top-bar-auth-button:hover {
+  background-color: var(--light-blue);
+}
+
+.top-bar-auth-link {
+  text-decoration: none;
+  color: var(--light-gray);
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  transition: 0.2s;
+}
+
+.light-mode .top-bar-auth-link {
+  color: var(--dark-gray);
+}
+
+.top-bar-auth-link:hover {
+  background-color: var(--midnight-black);
+}
+
+.light-mode .top-bar-auth-link:hover {
+  background-color: var(--light-blue);
+}
