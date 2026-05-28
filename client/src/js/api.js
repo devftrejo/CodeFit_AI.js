@@ -1,7 +1,10 @@
-// Thin wrapper around the streaming chat endpoint.
-// VITE_API_URL is set in client/.env (see .env.example).
+// Thin wrapper around the streaming chat endpoint. Defaults to the
+// same-origin /api/chat path, which:
+//   - in dev, Vite proxies to the Functions emulator (see client/vite.config.js)
+//   - in prod, Firebase Hosting rewrites to the chat Cloud Function
+// Set VITE_API_URL in client/.env only to override (e.g. non-Firebase deploy).
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/";
+const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 
 export async function streamChat({ message, role, onChunk }) {
   const response = await fetch(API_URL, {
