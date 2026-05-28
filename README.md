@@ -34,6 +34,9 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
        <a href="">
          <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" alt="Express JS Badge"/>
        </a>
+       <a href="">
+         <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase Badge"/>
+       </a>
    </div>
 </div>
 
@@ -41,14 +44,17 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 
 ## Repository Layout
 
-This repo is an **npm workspace** with two packages:
+This repo is an **npm workspace** with three packages:
 
 ```
-client/   Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
-server/   Express API — single POST / endpoint that streams OpenAI chat completions; owns the AI system prompts
+client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
+server/      Express API — POST / endpoint, OpenAI streaming. Transitional: replaced by functions/ in an in-flight Firebase migration.
+functions/   Cloud Functions for Firebase (v2, ESM). Stub until Phase 2 of the migration ports the chat handler.
 ```
 
-All dependencies for both packages hoist to a single root `node_modules/`, so you install once at the root.
+Most dependencies hoist to a single root `node_modules/`, so you install once at the repo root. (A few `functions/` deps stay local under `functions/node_modules/` because of npm version-resolution rules — that's normal and works both locally and on Firebase deploys.)
+
+Firebase configuration lives at the repo root: `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`.
 
 The client ships four pages:
 
@@ -82,7 +88,7 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
 
    (replace `"repository-url"` with the actual URL).
 
-2. **Install dependencies from the repo root** — one command installs both packages:
+2. **Install dependencies from the repo root** — one command installs all three packages:
 
    ```sh
    npm install
@@ -96,6 +102,33 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
      ```
 
    - `client/.env` — optional. Only needed if your server runs somewhere other than `http://localhost:3000/`. Copy `client/.env.example` and edit `VITE_API_URL`.
+
+4. **Firebase setup** (required for `firebase deploy`, optional for day-to-day Phase 1 dev):
+   - Install the Firebase CLI globally:
+
+     ```sh
+     npm install -g firebase-tools
+     ```
+
+   - Authenticate with the Google account that has access to the project:
+
+     ```sh
+     firebase login
+     ```
+
+   - Verify the project alias resolves (should print `codefit-ai-js`):
+
+     ```sh
+     firebase use
+     ```
+
+   - For deployed Cloud Functions, the OpenAI key is stored as a Secret Manager secret (the deployed analog of `server/.env`):
+
+     ```sh
+     firebase functions:secrets:set OPENAI_API_KEY
+     ```
+
+   - **Plan requirement:** Cloud Functions calling external APIs (like OpenAI) requires the project to be on the **Blaze (pay-as-you-go)** plan. Spark/free tier covers Hosting and basic Firestore but not the chat function.
 
 ### Day-to-Day Development
 
@@ -118,6 +151,14 @@ npm run dev -w client      # Vite client only
 npm run watch -w server    # Nodemon-restarted Express server only
 ```
 
+To run only the Firebase emulator suite (Functions, Firestore, Auth) — useful starting in Phase 2 once the chat handler ports to a Cloud Function:
+
+```sh
+npm run emulators
+```
+
+Until Phase 2 the primary dev loop is still `npm run dev` (Vite + Express).
+
 ### Formatting & Linting
 
 Prettier and ESLint are wired up at the repo root. Run before committing:
@@ -125,7 +166,7 @@ Prettier and ESLint are wired up at the repo root. Run before committing:
 ```sh
 npm run format         # write formatting changes
 npm run format:check   # check without writing
-npm run lint           # ESLint over client/ and server/
+npm run lint           # ESLint over client/, server/, and functions/
 ```
 
 ### Production Build & Preview
@@ -134,6 +175,16 @@ npm run lint           # ESLint over client/ and server/
 npm run build     # builds client/ to client/dist/
 npm run preview   # serves the built client locally
 ```
+
+### Firebase Deploy
+
+Once the migration is far enough along (Phase 6+), one command builds the client and deploys Hosting + Functions + Firestore rules:
+
+```sh
+npm run firebase:deploy
+```
+
+Requires the Firebase Setup steps above. Don't run this until Phase 6 of the migration — earlier phases will deploy an incomplete or broken app.
 
 Pushing changes: use your preferred Git workflow (VSCode UI or CLI).
 
