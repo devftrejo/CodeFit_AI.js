@@ -159,7 +159,13 @@ export const chat = onRequest(
       res.writeHead(200, {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
-        Connection: "keep-alive",
+        // In the emulator, the Vite dev proxy pools the upstream socket; a
+        // keep-alive SSE response leaves it in a state that makes the proxy's
+        // next request fail (every other chat 400s). Closing the connection
+        // forces a fresh socket per request. In prod the platform manages
+        // connections, so keep-alive is correct there.
+        Connection:
+          process.env.FUNCTIONS_EMULATOR === "true" ? "close" : "keep-alive",
       });
 
       for await (const chunk of stream) {
