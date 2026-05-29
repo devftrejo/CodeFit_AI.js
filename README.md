@@ -48,22 +48,23 @@ This repo is an **npm workspace** with three packages:
 
 ```
 client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
-server/      Express API — POST / endpoint, OpenAI streaming. Transitional: replaced by functions/ in an in-flight Firebase migration.
-functions/   Cloud Functions for Firebase (v2, ESM). Stub until Phase 2 of the migration ports the chat handler.
+server/      Express API — POST / endpoint, OpenAI streaming. Transitional: superseded by functions/; removed in Phase 7.
+functions/   Cloud Functions for Firebase (v2, ESM). The chat handler: auth, OpenAI streaming, and Firestore persistence.
 ```
 
 Most dependencies hoist to a single root `node_modules/`, so you install once at the repo root. (A few `functions/` deps stay local under `functions/node_modules/` because of npm version-resolution rules — that's normal and works both locally and on Firebase deploys.)
 
 Firebase configuration lives at the repo root: `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`.
 
-The client ships four pages:
+The client ships five pages:
 
 - `/` — landing
-- `/app.html` — the chat + code-sandbox app
+- `/app.html` — the chat + code-sandbox app (gated on sign-in)
 - `/about.html` — about
 - `/contact.html` — contact
+- `/sign-in.html` — sign-in / create-account (Email/Password + Google)
 
-All four share a top-bar nav. The chat app additionally has an off-canvas navbar for the Curriculum and AI Roles menus.
+All five share a top-bar nav. The chat app additionally has an off-canvas navbar for the Conversations, Curriculum, and AI Roles menus.
 
 ## Getting Started
 
@@ -95,15 +96,16 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
    ```
 
 3. **Add your environment files**:
-   - `server/.env` — **required**. Holds your `OPENAI_API_KEY`. Without it the `POST /` endpoint returns 500:
+   - `functions/.secret.local` — **required for local chat**. Holds `OPENAI_API_KEY=sk-...` for the Functions emulator (gitignored). The deployed function reads the key from Secret Manager instead.
 
      ```
      OPENAI_API_KEY=sk-...
      ```
 
-   - `client/.env` — optional. Only needed if your server runs somewhere other than `http://localhost:3000/`. Copy `client/.env.example` and edit `VITE_API_URL`.
+   - `server/.env` — only for the legacy Express flow (`npm run dev:legacy`); same `OPENAI_API_KEY`. Removed with `server/` in Phase 7.
+   - `client/.env` — optional. `VITE_API_URL` overrides the chat endpoint; not needed for normal dev (defaults to `/api/chat` → emulator) or prod (set in `client/.env.production`). See `client/.env.example`.
 
-4. **Firebase setup** (required for `firebase deploy`, optional for day-to-day Phase 1 dev):
+4. **Firebase setup** (the Firebase CLI runs the emulators for local dev and performs deploys):
    - Install the Firebase CLI globally:
 
      ```sh
@@ -122,13 +124,15 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
      firebase use
      ```
 
-   - For deployed Cloud Functions, the OpenAI key is stored as a Secret Manager secret (the deployed analog of `server/.env`):
+   - For deployed Cloud Functions, the OpenAI key is stored as a Secret Manager secret (the deployed analog of `functions/.secret.local`):
 
      ```sh
      firebase functions:secrets:set OPENAI_API_KEY
      ```
 
-   - **Plan requirement:** Cloud Functions calling external APIs (like OpenAI) requires the project to be on the **Blaze (pay-as-you-go)** plan. Spark/free tier covers Hosting and basic Firestore but not the chat function.
+     ⚠️ On Windows, don't pipe the value through PowerShell stdin — it injects a UTF-8 BOM that corrupts the key (the OpenAI call then 500s). Paste it when prompted, or use `--data-file <ascii-file>`.
+
+   - **Plan requirement:** Cloud Functions calling external APIs (like OpenAI) requires the project to be on the **Blaze (pay-as-you-go)** plan. Spark/free tier covers Hosting and basic Firestore but not the chat function. Upgrade **before** the first deploy.
 
 ### Day-to-Day Development
 
@@ -138,26 +142,24 @@ Always pull before starting work:
 git pull
 ```
 
-Start both the Vite client (port **8080**) and the Express server (port **3000**) with a single command from the repo root:
+Start the Vite client (port **8080**) and the Firebase emulators — Functions (**5001**), Auth (**9099**), Firestore (**8085**) — with a single command from the repo root. The Firestore emulator needs a JDK installed.
 
 ```sh
 npm run dev
 ```
 
-To run only one side independently:
+To run only one piece:
 
 ```sh
 npm run dev -w client      # Vite client only
-npm run watch -w server    # Nodemon-restarted Express server only
+npm run emulators          # Firebase emulator suite only
 ```
 
-To run only the Firebase emulator suite (Functions, Firestore, Auth) — useful starting in Phase 2 once the chat handler ports to a Cloud Function:
+The legacy Vite + Express flow is still available until `server/` is removed in Phase 7 (point `client/.env` at `http://localhost:3000/` via `VITE_API_URL`):
 
 ```sh
-npm run emulators
+npm run dev:legacy         # Vite + Nodemon-restarted Express server
 ```
-
-Until Phase 2 the primary dev loop is still `npm run dev` (Vite + Express).
 
 ### Formatting & Linting
 
@@ -178,13 +180,20 @@ npm run preview   # serves the built client locally
 
 ### Firebase Deploy
 
-Once the migration is far enough along (Phase 6+), one command builds the client and deploys Hosting + Functions + Firestore rules:
+The app is **live at https://codefit-ai-js.web.app**. One command builds the client and deploys Hosting + Functions + Firestore rules:
 
 ```sh
 npm run firebase:deploy
 ```
 
-Requires the Firebase Setup steps above. Don't run this until Phase 6 of the migration — earlier phases will deploy an incomplete or broken app.
+**One-time setup before the first deploy** (Firebase / Cloud console):
+
+- Project on the **Blaze** plan (Cloud Functions requirement).
+- OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above).
+- If the function URL returns a Google **403** after deploying, enable Cloud Run → `chat` → **Allow unauthenticated invocations** (auth is still enforced in-function via the Firebase token).
+- Email/Password + Google enabled under Authentication → Sign-in method.
+
+**Prod streaming note:** the production client calls the Cloud Function **directly** (via `VITE_API_URL` in `client/.env.production`), not the `/api/chat` Hosting rewrite, because Hosting buffers Server-Sent Events. The function sets restricted CORS + `no-transform` so the stream isn't gzip-buffered by Google's frontend. See CLAUDE.md → "Deployment" for the full architecture and a troubleshooting table.
 
 Pushing changes: use your preferred Git workflow (VSCode UI or CLI).
 
