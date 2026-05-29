@@ -10,9 +10,10 @@ client/dist
 # Firebase CLI deploy cache
 .firebase
 
-# Firebase CLI debug logs
+# Firebase CLI + emulator debug logs (firebase-, firestore-, ui-, database-, pubsub-)
 firebase-debug.log
 firebase-debug.*.log
+*-debug.log
 
 # Local-only files (Firebase emulator secrets, dev overrides)
 *.local

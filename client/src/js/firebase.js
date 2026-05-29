@@ -7,6 +7,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDOLg5HNvTRG7ljFo_DzFBtUHD5KLJG3i0",
@@ -19,12 +20,15 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// In dev (Vite serves on localhost), point at the Auth emulator so test
-// sign-ups don't pollute real Firebase Auth. In prod (the built bundle),
-// import.meta.env.DEV is false and this is skipped.
+// In dev (Vite serves on localhost), point at the emulators so test data
+// doesn't touch real Firebase. In prod (the built bundle), import.meta.env.DEV
+// is false and these are skipped. Firestore runs on 8085 (not its 8080 default)
+// to avoid colliding with the Vite dev server — see firebase.json emulators.
 if (import.meta.env.DEV) {
   connectAuthEmulator(auth, "http://127.0.0.1:9099", {
     disableWarnings: true,
   });
+  connectFirestoreEmulator(db, "127.0.0.1", 8085);
 }

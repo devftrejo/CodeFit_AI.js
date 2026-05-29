@@ -8,7 +8,10 @@ import { getIdToken } from "./auth.js";
 
 const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 
-export async function streamChat({ message, role, onChunk }) {
+// Resolves to { conversationId } once the stream completes. Pass the existing
+// conversationId to continue a conversation, or null/undefined to start a new
+// one (the function creates it and returns the new id in the final SSE event).
+export async function streamChat({ message, role, conversationId, onChunk }) {
   const token = await getIdToken();
   if (!token) {
     throw new Error("Not signed in.");
@@ -20,7 +23,11 @@ export async function streamChat({ message, role, onChunk }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ message, role }),
+    body: JSON.stringify({
+      message,
+      role,
+      conversationId: conversationId ?? null,
+    }),
   });
 
   if (!response.ok) {
@@ -29,6 +36,7 @@ export async function streamChat({ message, role, onChunk }) {
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
+  let resolvedConversationId = conversationId ?? null;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -40,9 +48,19 @@ export async function streamChat({ message, role, onChunk }) {
     for (const line of lines) {
       if (!line.startsWith("data: ")) continue;
       const dataStr = line.slice(6);
-      if (dataStr === "[DONE]") return;
+      if (dataStr === "[DONE]")
+        return { conversationId: resolvedConversationId };
       const data = JSON.parse(dataStr);
-      onChunk(data.content);
+      if (typeof data.content === "string") {
+        onChunk(data.content);
+      } else if (data.conversationId) {
+        // Final metadata event from the function.
+        resolvedConversationId = data.conversationId;
+      } else if (data.error) {
+        throw new Error(data.error);
+      }
     }
   }
+
+  return { conversationId: resolvedConversationId };
 }

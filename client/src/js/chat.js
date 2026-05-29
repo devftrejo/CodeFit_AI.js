@@ -3,9 +3,15 @@ import { marked } from "marked";
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
 
-// systemMessages now lives on the server (server/prompts.js); the client only
-// tracks which role key to send.
+// systemMessages now lives on the server (functions/prompts.js); the client
+// only tracks which role key to send.
 let currentRole = "codeExplainer";
+
+// The conversation the current chat belongs to. Null until the first message
+// creates one server-side; the function returns the id, which we reuse for
+// subsequent messages so they thread into the same conversation. Phase 5 will
+// let the user switch/clear this from a conversations menu.
+let currentConversationId = null;
 
 const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");
@@ -33,15 +39,19 @@ async function sendMessage(customMessage = null) {
   let botReply = "";
 
   try {
-    await streamChat({
+    const result = await streamChat({
       message,
       role: currentRole,
+      conversationId: currentConversationId,
       onChunk: (chunk) => {
         botReply += chunk;
         botMessageElement.innerHTML = marked.parse(botReply);
         chatMessages.scrollTop = chatMessages.scrollHeight;
       },
     });
+    if (result?.conversationId) {
+      currentConversationId = result.conversationId;
+    }
   } catch (error) {
     console.error("Error:", error);
     addMessage("An error occurred while processing your request.");
