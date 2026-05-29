@@ -128,21 +128,24 @@ ul.submenu li {
   border: 1px solid var(--js-yellow);
 }
 
-/* Conversations list (dynamic rows inside the Conversations submenu) */
+/* Dynamic navbar lists — shared by the Conversations and Snippets submenus */
 
-.conversation-list {
+.conversation-list,
+.snippet-list {
   max-height: 280px;
   overflow-y: auto;
 }
 
-.conversation-empty {
+.conversation-empty,
+.snippet-empty {
   padding: 8px 4px;
   color: var(--gray);
   font-size: 13px;
   font-style: italic;
 }
 
-.conversation-item {
+.conversation-item,
+.snippet-item {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -150,15 +153,18 @@ ul.submenu li {
   padding: 0 4px;
 }
 
-.conversation-item.active {
+.conversation-item.active,
+.snippet-item.active {
   background-color: var(--midnight-black);
 }
 
-.light-mode .conversation-item.active {
+.light-mode .conversation-item.active,
+.light-mode .snippet-item.active {
   background-color: var(--light-blue);
 }
 
-.conversation-title {
+.conversation-title,
+.snippet-title {
   flex: 1;
   min-width: 0; /* let the ellipsis kick in inside a flex row */
   background: none;
@@ -174,21 +180,25 @@ ul.submenu li {
   text-overflow: ellipsis;
 }
 
-.light-mode .conversation-title {
+.light-mode .conversation-title,
+.light-mode .snippet-title {
   color: var(--dark-gray);
 }
 
-.conversation-title:hover {
+.conversation-title:hover,
+.snippet-title:hover {
   color: var(--js-yellow);
 }
 
-.conversation-actions {
+.conversation-actions,
+.snippet-actions {
   display: flex;
   gap: 2px;
   flex-shrink: 0;
 }
 
-.conversation-action {
+.conversation-action,
+.snippet-action {
   background: none;
   border: none;
   cursor: pointer;
@@ -198,11 +208,13 @@ ul.submenu li {
   border-radius: 3px;
 }
 
-.conversation-action:hover {
+.conversation-action:hover,
+.snippet-action:hover {
   color: var(--js-yellow);
 }
 
-.conversation-rename-input {
+.conversation-rename-input,
+.snippet-rename-input {
   width: 100%;
   box-sizing: border-box;
   background-color: var(--midnight-black);
@@ -214,12 +226,14 @@ ul.submenu li {
   padding: 6px 4px;
 }
 
-.light-mode .conversation-rename-input {
+.light-mode .conversation-rename-input,
+.light-mode .snippet-rename-input {
   background-color: var(--white);
   color: var(--dark-gray);
 }
 
-.conversation-rename-input:focus {
+.conversation-rename-input:focus,
+.snippet-rename-input:focus {
   outline: none;
 }
 

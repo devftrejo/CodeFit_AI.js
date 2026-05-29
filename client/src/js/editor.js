@@ -116,3 +116,28 @@ clearConsoleButton.addEventListener("click", clearConsole);
 themeSelect.addEventListener("change", changeTheme);
 
 updatePreview();
+
+// --- Snippet integration (snippets.js) -------------------------------------
+
+// Current contents of the three editors, for saving a snippet.
+export function getEditorContents() {
+  return {
+    html: htmlEditor.state.doc.toString(),
+    css: cssEditor.state.doc.toString(),
+    js: jsEditor.state.doc.toString(),
+  };
+}
+
+// Replace all three editors' contents (loading a snippet). Each dispatch fires
+// the HTML/CSS preview listeners; updatePreview() also runs explicitly so the
+// JS pane (which has no listener) is reflected too.
+export function setEditorContents({ html = "", css = "", js = "" }) {
+  const replaceDoc = (view, text) =>
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: text },
+    });
+  replaceDoc(htmlEditor, html);
+  replaceDoc(cssEditor, css);
+  replaceDoc(jsEditor, js);
+  updatePreview();
+}

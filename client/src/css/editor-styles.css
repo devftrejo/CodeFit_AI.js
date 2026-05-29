@@ -82,6 +82,19 @@
   background-color: var(--dark-gray);
 }
 
+/* Shows which saved snippet is being edited (set by snippets.js). */
+.active-snippet {
+  margin-left: 10px;
+  color: var(--light-gray);
+  font-size: 13px;
+  font-style: italic;
+  vertical-align: middle;
+}
+
+.light-mode .active-snippet {
+  color: var(--dark-gray);
+}
+
 .midnight-theme {
   color: var(--light-blue);
 }

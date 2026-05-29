@@ -63,6 +63,20 @@
           </ul>
         </li>
 
+        <!-- Snippets (list populated by snippets.js; save lives on the editor) -->
+
+        <li>
+          <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-bookmark"></i> Snippets
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <ul id="snippet-list" class="snippet-list"></ul>
+            </li>
+          </ul>
+        </li>
+
         <!-- Curriculum -->
 
         <li>
@@ -238,12 +252,23 @@
               <option class="option" value="midnight">Midnight</option>
               <option class="option" value="elegant">Elegant</option>
             </select>
-            <button id="run-code" class="button">
+            <button id="run-code" class="button" title="Run code">
               <i class="fa-regular fa-circle-play"></i>
             </button>
-            <button id="clear-console" class="button">
+            <button id="clear-console" class="button" title="Clear console">
               <i class="fa-solid fa-broom"></i>
             </button>
+            <button id="save-snippet" class="button" title="Save snippet">
+              <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+            <button
+              id="save-snippet-as"
+              class="button"
+              title="Save as new snippet"
+            >
+              <i class="fa-solid fa-file-circle-plus"></i>
+            </button>
+            <span id="active-snippet" class="active-snippet"></span>
           </div>
           <div class="content">
             <div class="editors">
