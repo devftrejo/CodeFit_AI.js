@@ -22,9 +22,11 @@ onAuthChange(async (user) => {
   }
 
   // Signed in — load the app modules now that we know the user is allowed.
+  // conversations.js imports chat.js + navbar.js, so those evaluate first.
   await Promise.all([
     import("../navbar.js"),
     import("../editor.js"),
     import("../chat.js"),
+    import("../conversations.js"),
   ]);
 });

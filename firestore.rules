@@ -16,11 +16,18 @@ service cloud.firestore {
       allow read, write: if isOwner(uid);
 
       match /conversations/{conversationId} {
-        // Conversations are created/updated by the chat function (Admin SDK).
-        // Clients may read and delete their own, but never create/edit them
-        // directly — that keeps titles/metadata honest.
+        // Conversations are created by the chat function (Admin SDK). Clients
+        // may read and delete their own. Creation stays server-only so role
+        // and timestamps stay honest. The one client write allowed is a
+        // rename: an update that touches *only* the `title` field (a non-empty
+        // string ≤ 200 chars) — clients can't forge role, createdAt, etc.
         allow read, delete: if isOwner(uid);
-        allow create, update: if false;
+        allow create: if false;
+        allow update: if isOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["title"])
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 200;
 
         match /messages/{messageId} {
           // Messages are written only by the function. Clients read their own

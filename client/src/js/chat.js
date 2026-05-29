@@ -9,13 +9,29 @@ let currentRole = "codeExplainer";
 
 // The conversation the current chat belongs to. Null until the first message
 // creates one server-side; the function returns the id, which we reuse for
-// subsequent messages so they thread into the same conversation. Phase 5 will
-// let the user switch/clear this from a conversations menu.
+// subsequent messages so they thread into the same conversation. The
+// conversations menu (conversations.js) switches/clears this via the exported
+// loadConversation / startNewConversation helpers.
 let currentConversationId = null;
 
 const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");
 const sendButton = document.getElementById("sendButton");
+
+export function getCurrentConversationId() {
+  return currentConversationId;
+}
+
+// Single place that mutates currentConversationId, so the conversations menu
+// can re-highlight the active row whenever it changes (new chat, switch, or
+// the id the server assigns to the first message of a fresh conversation).
+function setConversation(id) {
+  if (currentConversationId === id) return;
+  currentConversationId = id;
+  document.dispatchEvent(
+    new CustomEvent("conversation-changed", { detail: { conversationId: id } })
+  );
+}
 
 function addMessage(content, isUser = false) {
   const messageElement = document.createElement("div");
@@ -50,7 +66,7 @@ async function sendMessage(customMessage = null) {
       },
     });
     if (result?.conversationId) {
-      currentConversationId = result.conversationId;
+      setConversation(result.conversationId);
     }
   } catch (error) {
     console.error("Error:", error);
@@ -97,9 +113,7 @@ function handleCurriculumTopicSelection(language, topic) {
   sendMessage(`Explain the ${topic} topic in ${language}.`);
 }
 
-function aiIntroduction() {
-  setTimeout(() => {
-    const introMessage = `
+const INTRO_MESSAGE = `
 **Hello! I'm Code Fit AI, your personal coding assistant.**
 
 I can help you with various programming tasks, including:
@@ -115,8 +129,31 @@ To get started, you can:
 
 *How can I assist you today?*`;
 
-    addMessage(introMessage, false);
-  }, 1000);
+function clearChat() {
+  chatMessages.innerHTML = "";
+}
+
+function aiIntroduction() {
+  setTimeout(() => addMessage(INTRO_MESSAGE, false), 1000);
+}
+
+// Switch the chat pane to a stored conversation: clear the pane, remember the
+// id (so follow-ups thread into it), and replay its messages. `messages` is an
+// array of { role: "user"|"assistant", content } ordered oldest-first.
+export function loadConversation(id, messages) {
+  setConversation(id);
+  clearChat();
+  for (const m of messages) {
+    addMessage(m.content, m.role === "user");
+  }
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Reset to a blank conversation — the next message starts a new one server-side.
+export function startNewConversation() {
+  setConversation(null);
+  clearChat();
+  addMessage(INTRO_MESSAGE, false);
 }
 
 sendButton.addEventListener("click", () => sendMessage());

@@ -128,6 +128,101 @@ ul.submenu li {
   border: 1px solid var(--js-yellow);
 }
 
+/* Conversations list (dynamic rows inside the Conversations submenu) */
+
+.conversation-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.conversation-empty {
+  padding: 8px 4px;
+  color: var(--gray);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+.conversation-item.active {
+  background-color: var(--midnight-black);
+}
+
+.light-mode .conversation-item.active {
+  background-color: var(--light-blue);
+}
+
+.conversation-title {
+  flex: 1;
+  min-width: 0; /* let the ellipsis kick in inside a flex row */
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--light-gray);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.light-mode .conversation-title {
+  color: var(--dark-gray);
+}
+
+.conversation-title:hover {
+  color: var(--js-yellow);
+}
+
+.conversation-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.conversation-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray);
+  font-size: 12px;
+  padding: 6px;
+  border-radius: 3px;
+}
+
+.conversation-action:hover {
+  color: var(--js-yellow);
+}
+
+.conversation-rename-input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--midnight-black);
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  color: var(--light-gray);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 4px;
+}
+
+.light-mode .conversation-rename-input {
+  background-color: var(--white);
+  color: var(--dark-gray);
+}
+
+.conversation-rename-input:focus {
+  outline: none;
+}
+
 .user-profile {
   padding: 20px;
   text-align: center;
