@@ -39,9 +39,16 @@ export const chat = onRequest(
     secrets: [openaiKey],
     memory: "512MiB",
     timeoutSeconds: 300,
-    // CORS is handled by the Hosting rewrite in prod and Vite proxy in dev,
-    // so the function itself stays same-origin.
-    cors: false,
+    // The client calls this function directly in prod (Firebase Hosting buffers
+    // SSE from rewrites, which breaks streaming), so CORS must allow our own
+    // origins. Restricted to the app's domains; the Firebase ID token is still
+    // the real gate. Dev uses the Vite proxy (same-origin), so localhost is
+    // only here for the occasional direct emulator call.
+    cors: [
+      "https://codefit-ai-js.web.app",
+      "https://codefit-ai-js.firebaseapp.com",
+      "http://localhost:8080",
+    ],
   },
   async (req, res) => {
     if (req.method !== "POST") {
@@ -158,7 +165,13 @@ export const chat = onRequest(
 
       res.writeHead(200, {
         "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
+        // `no-transform` stops the Google Front End from gzip-compressing the
+        // response — compression buffers the whole body and breaks SSE
+        // streaming. This applies behind both Hosting rewrites and direct
+        // Cloud Run, since both sit behind the GFE. `X-Accel-Buffering: no`
+        // additionally signals proxies not to buffer the stream.
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no",
         // In the emulator, the Vite dev proxy pools the upstream socket; a
         // keep-alive SSE response leaves it in a state that makes the proxy's
         // next request fail (every other chat 400s). Closing the connection

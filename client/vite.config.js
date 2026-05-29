@@ -7,6 +7,11 @@ const FUNCTIONS_PATH_PREFIX = "/codefit-ai-js/us-central1";
 
 export default defineConfig({
   root: resolve(__dirname, "src"),
+  // .env files live at the package root (client/), not the Vite root
+  // (client/src), so point env loading there — otherwise client/.env.production
+  // is ignored and prod falls back to /api/chat (which Hosting buffers, breaking
+  // SSE streaming). Keep in sync with where .env.example lives.
+  envDir: __dirname,
   build: {
     outDir: "../dist",
     emptyOutDir: true,
