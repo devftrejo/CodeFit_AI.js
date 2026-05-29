@@ -253,6 +253,7 @@ ul.submenu li {
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  object-fit: cover; /* keep Google profile photos round, not squashed */
   margin-bottom: 10px;
 }
 

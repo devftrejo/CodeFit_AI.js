@@ -30,5 +30,6 @@ onAuthChange(async (user) => {
     import("../chat.js"),
     import("../conversations.js"),
     import("../snippets.js"),
+    import("../profile.js"),
   ]);
 });

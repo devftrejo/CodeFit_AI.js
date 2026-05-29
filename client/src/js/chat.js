@@ -100,10 +100,25 @@ function updateSelectedRole(role, { announce = true } = {}) {
     el.classList.toggle("active", el.dataset.role === role);
   });
 
-  if (announce && ROLE_LABELS[role]) {
-    addMessage(`AI role changed to: ${ROLE_LABELS[role].title}`, false);
-    addMessage(ROLE_LABELS[role].prompt, false);
+  if (announce) {
+    if (ROLE_LABELS[role]) {
+      addMessage(`AI role changed to: ${ROLE_LABELS[role].title}`, false);
+      addMessage(ROLE_LABELS[role].prompt, false);
+    }
+    // `announce` marks an explicit AI Roles menu pick (vs a silent change from
+    // curriculum selection or restoring the saved preference on load), so this
+    // is the moment profile.js remembers the role as the user's preferred one.
+    document.dispatchEvent(
+      new CustomEvent("role-changed", { detail: { role } })
+    );
   }
+}
+
+// Set the active role programmatically (e.g. restoring a saved preferredRole on
+// load). Pass { announce: false } to avoid the chat banner and the
+// "role-changed" event, so restoring a preference doesn't re-save it.
+export function setRole(role, options = {}) {
+  updateSelectedRole(role, options);
 }
 
 function handleCurriculumTopicSelection(language, topic) {
