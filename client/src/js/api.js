@@ -12,7 +12,16 @@ const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 // Resolves to { conversationId } once the stream completes. Pass the existing
 // conversationId to continue a conversation, or null/undefined to start a new
 // one (the function creates it and returns the new id in the final SSE event).
-export async function streamChat({ message, role, conversationId, onChunk }) {
+// `language`/`topic` identify the curriculum topic a new conversation belongs
+// to — required when conversationId is null (every chat is topic-scoped).
+export async function streamChat({
+  message,
+  role,
+  conversationId,
+  language,
+  topic,
+  onChunk,
+}) {
   const token = await getIdToken();
   if (!token) {
     throw new Error("Not signed in.");
@@ -28,6 +37,8 @@ export async function streamChat({ message, role, conversationId, onChunk }) {
       message,
       role,
       conversationId: conversationId ?? null,
+      language: language ?? null,
+      topic: topic ?? null,
     }),
   });
 

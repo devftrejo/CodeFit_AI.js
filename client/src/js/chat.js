@@ -7,30 +7,30 @@ import { closeNavbar } from "./navbar.js";
 // only tracks which role key to send.
 let currentRole = "codeExplainer";
 
-// The conversation the current chat belongs to. Null until the first message
-// creates one server-side; the function returns the id, which we reuse for
-// subsequent messages so they thread into the same conversation. The
-// conversations menu (conversations.js) switches/clears this via the exported
-// loadConversation / startNewConversation helpers.
+// The conversation the current chat belongs to. Every conversation is anchored
+// to a curriculum topic (see curriculum.js): there's no free-form chat outside
+// the curriculum. `currentConversationId` is null until the first message of a
+// topic creates one server-side (the function returns the id, which we reuse so
+// follow-ups thread into the same conversation). `activeTopic` is the
+// { language, topic } the chat is scoped to — null means no topic picked yet,
+// so the input is disabled and sending is blocked.
 let currentConversationId = null;
+let activeTopic = null;
 
 const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");
 const sendButton = document.getElementById("sendButton");
 
-export function getCurrentConversationId() {
-  return currentConversationId;
-}
+const NO_TOPIC_PLACEHOLDER =
+  "Select a topic from the Curriculum menu to begin…";
+const TOPIC_PLACEHOLDER = "Type your message…";
 
-// Single place that mutates currentConversationId, so the conversations menu
-// can re-highlight the active row whenever it changes (new chat, switch, or
-// the id the server assigns to the first message of a fresh conversation).
-function setConversation(id) {
-  if (currentConversationId === id) return;
-  currentConversationId = id;
-  document.dispatchEvent(
-    new CustomEvent("conversation-changed", { detail: { conversationId: id } })
-  );
+// Disable the chat input until a curriculum topic is active, so a learner can't
+// start a conversation that isn't anchored to something they're learning.
+function setInputEnabled(enabled) {
+  userInput.disabled = !enabled;
+  sendButton.disabled = !enabled;
+  userInput.placeholder = enabled ? TOPIC_PLACEHOLDER : NO_TOPIC_PLACEHOLDER;
 }
 
 function addMessage(content, isUser = false) {
@@ -45,6 +45,9 @@ function addMessage(content, isUser = false) {
 }
 
 async function sendMessage(customMessage = null) {
+  // No topic, no chat — the input is disabled in this state, but guard anyway.
+  if (!activeTopic) return;
+
   const message = customMessage || userInput.value.trim();
   if (!message) return;
 
@@ -59,6 +62,8 @@ async function sendMessage(customMessage = null) {
       message,
       role: currentRole,
       conversationId: currentConversationId,
+      language: activeTopic.language,
+      topic: activeTopic.topic,
       onChunk: (chunk) => {
         botReply += chunk;
         botMessageElement.innerHTML = marked.parse(botReply);
@@ -66,7 +71,7 @@ async function sendMessage(customMessage = null) {
       },
     });
     if (result?.conversationId) {
-      setConversation(result.conversationId);
+      currentConversationId = result.conversationId;
     }
   } catch (error) {
     console.error("Error:", error);
@@ -121,54 +126,49 @@ export function setRole(role, options = {}) {
   updateSelectedRole(role, options);
 }
 
-function handleCurriculumTopicSelection(language, topic) {
-  // Skip the announcement — we're about to send the actual prompt, so the
-  // generic "select a topic from the menu" message would be contradictory.
-  updateSelectedRole("curriculumExplainer", { announce: false });
-  sendMessage(`Explain the ${topic} topic in ${language}.`);
-}
-
 const INTRO_MESSAGE = `
 **Hello! I'm Code Fit AI, your personal coding assistant.**
 
-I can help you with various programming tasks, including:
-* Explaining code
-* Debugging
-* Optimization
-* Teaching web development concepts
+To keep you on track, every chat is anchored to a lesson. Pick a topic from the
+**Curriculum** menu to begin — I'll explain it, then answer your follow-up
+questions right here in that topic's thread.
 
-To get started, you can:
-1. Choose a role for me from the AI Roles menu.
-2. Select a topic from the Curriculum menu to learn about specific concepts.
-3. Or simply type your coding question in the chat box below.
-
-*How can I assist you today?*`;
+Already covered a topic? Re-select it from the menu to pick the conversation
+back up where you left off.`;
 
 function clearChat() {
   chatMessages.innerHTML = "";
 }
 
+// Open a curriculum topic in the chat pane. Called by curriculum.js after it
+// resolves whether the topic already has a saved conversation:
+//   - With `conversationId` + `messages`: resume that topic's thread (replay).
+//   - Without: a fresh topic — clear the pane and kick it off with the
+//     "Explain…" prompt, which creates the conversation server-side.
+// Either way the chat becomes scoped to { language, topic } and the input is
+// enabled. The role is set to curriculumExplainer silently (no banner, and no
+// "role-changed" event, so it doesn't overwrite the user's preferredRole).
+export function openTopic({ language, topic, conversationId, messages }) {
+  updateSelectedRole("curriculumExplainer", { announce: false });
+  activeTopic = { language, topic };
+  setInputEnabled(true);
+
+  if (conversationId) {
+    currentConversationId = conversationId;
+    clearChat();
+    for (const m of messages ?? []) {
+      addMessage(m.content, m.role === "user");
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } else {
+    currentConversationId = null;
+    clearChat();
+    sendMessage(`Explain the ${topic} topic in ${language}.`);
+  }
+}
+
 function aiIntroduction() {
   setTimeout(() => addMessage(INTRO_MESSAGE, false), 1000);
-}
-
-// Switch the chat pane to a stored conversation: clear the pane, remember the
-// id (so follow-ups thread into it), and replay its messages. `messages` is an
-// array of { role: "user"|"assistant", content } ordered oldest-first.
-export function loadConversation(id, messages) {
-  setConversation(id);
-  clearChat();
-  for (const m of messages) {
-    addMessage(m.content, m.role === "user");
-  }
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-// Reset to a blank conversation — the next message starts a new one server-side.
-export function startNewConversation() {
-  setConversation(null);
-  clearChat();
-  addMessage(INTRO_MESSAGE, false);
 }
 
 sendButton.addEventListener("click", () => sendMessage());
@@ -186,14 +186,6 @@ document.querySelectorAll(".role-option").forEach((option) => {
   });
 });
 
-document.querySelectorAll(".curriculum-topic").forEach((topicElement) => {
-  topicElement.addEventListener("click", (e) => {
-    e.preventDefault();
-    const language = e.currentTarget.dataset.language;
-    const topic = e.currentTarget.dataset.topic;
-    handleCurriculumTopicSelection(language, topic);
-    closeNavbar();
-  });
-});
-
+// Start in the no-topic state: input disabled, intro nudging toward Curriculum.
+setInputEnabled(false);
 aiIntroduction();

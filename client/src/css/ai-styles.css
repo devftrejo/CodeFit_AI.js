@@ -27,6 +27,13 @@
   color: var(--light-gray);
 }
 
+/* Disabled until a curriculum topic is selected (chat.js gates the input). */
+#userInput:disabled,
+#sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Message Formatting */
 
 .message {

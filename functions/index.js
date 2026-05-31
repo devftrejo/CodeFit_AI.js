@@ -81,7 +81,7 @@ export const chat = onRequest(
     }
 
     const uid = decodedToken.uid;
-    const { message, role, conversationId } = req.body ?? {};
+    const { message, role, conversationId, language, topic } = req.body ?? {};
 
     if (typeof message !== "string" || !message.trim()) {
       res.status(400).json({ error: "`message` is required." });
@@ -92,6 +92,23 @@ export const chat = onRequest(
     if (!systemMessage) {
       res.status(400).json({
         error: `Unknown role: ${role}. Known roles: ${Object.keys(systemMessages).join(", ")}`,
+      });
+      return;
+    }
+
+    // Every conversation is anchored to a curriculum topic — there's no
+    // free-form chat outside the curriculum. A new conversation therefore
+    // requires the language + topic it belongs to; continuing an existing one
+    // (conversationId set) reuses that conversation's topic.
+    const hasTopic =
+      typeof language === "string" &&
+      language.trim() &&
+      typeof topic === "string" &&
+      topic.trim();
+    if (!conversationId && !hasTopic) {
+      res.status(400).json({
+        error:
+          "A curriculum `language` and `topic` are required to start a conversation.",
       });
       return;
     }
@@ -120,9 +137,14 @@ export const chat = onRequest(
           .get();
         priorMessages = messagesSnapshot.docs.map((doc) => doc.data());
       } else {
+        // New conversation: key it to its curriculum topic so the client can
+        // resume it by re-selecting the topic (topicKey = "<language>::<topic>").
         conversationRef = conversationsRef.doc();
         await conversationRef.set({
-          title: message.slice(0, TITLE_MAX_LENGTH),
+          title: `${language} · ${topic}`.slice(0, TITLE_MAX_LENGTH),
+          topicKey: `${language}::${topic}`,
+          language,
+          topic,
           role,
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),

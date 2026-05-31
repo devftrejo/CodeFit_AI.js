@@ -128,15 +128,13 @@ ul.submenu li {
   border: 1px solid var(--js-yellow);
 }
 
-/* Dynamic navbar lists — shared by the Conversations and Snippets submenus */
+/* Dynamic navbar list — the Snippets submenu */
 
-.conversation-list,
 .snippet-list {
   max-height: 280px;
   overflow-y: auto;
 }
 
-.conversation-empty,
 .snippet-empty {
   padding: 8px 4px;
   color: var(--gray);
@@ -144,7 +142,6 @@ ul.submenu li {
   font-style: italic;
 }
 
-.conversation-item,
 .snippet-item {
   display: flex;
   align-items: center;
@@ -153,17 +150,14 @@ ul.submenu li {
   padding: 0 4px;
 }
 
-.conversation-item.active,
 .snippet-item.active {
   background-color: var(--midnight-black);
 }
 
-.light-mode .conversation-item.active,
 .light-mode .snippet-item.active {
   background-color: var(--light-blue);
 }
 
-.conversation-title,
 .snippet-title {
   flex: 1;
   min-width: 0; /* let the ellipsis kick in inside a flex row */
@@ -180,24 +174,20 @@ ul.submenu li {
   text-overflow: ellipsis;
 }
 
-.light-mode .conversation-title,
 .light-mode .snippet-title {
   color: var(--dark-gray);
 }
 
-.conversation-title:hover,
 .snippet-title:hover {
   color: var(--js-yellow);
 }
 
-.conversation-actions,
 .snippet-actions {
   display: flex;
   gap: 2px;
   flex-shrink: 0;
 }
 
-.conversation-action,
 .snippet-action {
   background: none;
   border: none;
@@ -208,12 +198,10 @@ ul.submenu li {
   border-radius: 3px;
 }
 
-.conversation-action:hover,
 .snippet-action:hover {
   color: var(--js-yellow);
 }
 
-.conversation-rename-input,
 .snippet-rename-input {
   width: 100%;
   box-sizing: border-box;
@@ -226,13 +214,11 @@ ul.submenu li {
   padding: 6px 4px;
 }
 
-.light-mode .conversation-rename-input,
 .light-mode .snippet-rename-input {
   background-color: var(--white);
   color: var(--dark-gray);
 }
 
-.conversation-rename-input:focus,
 .snippet-rename-input:focus {
   outline: none;
 }
