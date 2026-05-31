@@ -2,10 +2,15 @@ import { marked } from "marked";
 
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
+import { getEditorContents } from "./editor.js";
 
 // systemMessages now lives on the server (functions/prompts.js); the client
 // only tracks which role key to send.
 let currentRole = "codeExplainer";
+
+// Roles whose help is about the user's own code — when one of these is active,
+// the current sandbox (editor) contents are attached to the request as context.
+const CODE_ROLES = new Set(["codeExplainer", "debugger", "optimizationExpert"]);
 
 // The conversation the current chat belongs to. Every conversation is anchored
 // to a curriculum topic (see curriculum.js): there's no free-form chat outside
@@ -57,6 +62,16 @@ async function sendMessage(customMessage = null) {
   const botMessageElement = addMessage("", false);
   let botReply = "";
 
+  // For code-focused roles, attach the current sandbox so the AI can work on
+  // what the learner actually wrote (only when a pane is non-empty).
+  let code = null;
+  if (CODE_ROLES.has(currentRole)) {
+    const contents = getEditorContents();
+    if (contents.html.trim() || contents.css.trim() || contents.js.trim()) {
+      code = contents;
+    }
+  }
+
   try {
     const result = await streamChat({
       message,
@@ -64,6 +79,7 @@ async function sendMessage(customMessage = null) {
       conversationId: currentConversationId,
       language: activeTopic.language,
       topic: activeTopic.topic,
+      code,
       onChunk: (chunk) => {
         botReply += chunk;
         botMessageElement.innerHTML = marked.parse(botReply);
@@ -82,15 +98,18 @@ async function sendMessage(customMessage = null) {
 const ROLE_LABELS = {
   codeExplainer: {
     title: "Code Explainer",
-    prompt: "Copy and paste the code you want me to explain to you.",
+    prompt:
+      "I'll look at your sandbox code — ask me to explain it, or paste a snippet.",
   },
   debugger: {
     title: "Debugger",
-    prompt: "Copy and paste the code you want me to help you debug.",
+    prompt:
+      "I'll look at your sandbox code — tell me the bug, or paste a snippet to debug.",
   },
   optimizationExpert: {
     title: "Optimization Expert",
-    prompt: "Copy and paste the code you want me to help you optimize.",
+    prompt:
+      "I'll look at your sandbox code — ask me to optimize it, or paste a snippet.",
   },
   curriculumExplainer: {
     title: "Curriculum Explainer",

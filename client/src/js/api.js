@@ -14,12 +14,15 @@ const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 // one (the function creates it and returns the new id in the final SSE event).
 // `language`/`topic` identify the curriculum topic a new conversation belongs
 // to — required when conversationId is null (every chat is topic-scoped).
+// `code` is the learner's current sandbox ({ html, css, js }), sent for
+// code-focused roles so the AI can work on it; null/omitted otherwise.
 export async function streamChat({
   message,
   role,
   conversationId,
   language,
   topic,
+  code,
   onChunk,
 }) {
   const token = await getIdToken();
@@ -39,6 +42,7 @@ export async function streamChat({
       conversationId: conversationId ?? null,
       language: language ?? null,
       topic: topic ?? null,
+      code: code ?? null,
     }),
   });
 

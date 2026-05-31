@@ -15,7 +15,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { OpenAI } from "openai";
 
-import { systemMessages } from "./prompts.js";
+import { systemMessages, buildSystemPrompt } from "./prompts.js";
 
 setGlobalOptions({ maxInstances: 10 });
 
@@ -33,6 +33,38 @@ const db = getFirestore();
 const openaiKey = defineSecret("OPENAI_API_KEY");
 
 const TITLE_MAX_LENGTH = 50;
+
+// Roles whose help is about the student's own code — for these we attach the
+// current sandbox (editor) contents as context. Plain curriculum Q&A doesn't.
+const CODE_ROLES = new Set(["codeExplainer", "debugger", "optimizationExpert"]);
+
+// Caps to keep the OpenAI request bounded in size and cost.
+const MAX_CODE_CHARS = 4000; // per editor pane
+const MAX_HISTORY_MESSAGES = 20; // most recent stored messages replayed as context
+
+// Build a context block from the student's sandbox code. Only non-empty panes
+// are included; each is capped at MAX_CODE_CHARS. Returns null when there's
+// nothing to send.
+function buildCodeContext(code) {
+  if (!code || typeof code !== "object") return null;
+  const cap = (value) => String(value).slice(0, MAX_CODE_CHARS);
+  const panes = [
+    ["HTML", "html", code.html],
+    ["CSS", "css", code.css],
+    ["JavaScript", "javascript", code.js],
+  ];
+  const parts = panes
+    .filter(([, , value]) => typeof value === "string" && value.trim())
+    .map(
+      ([label, fence, value]) =>
+        `${label}:\n\`\`\`${fence}\n${cap(value)}\n\`\`\``
+    );
+  if (!parts.length) return null;
+  return (
+    "The student's current sandbox code is below. Base your help on it.\n\n" +
+    parts.join("\n\n")
+  );
+}
 
 export const chat = onRequest(
   {
@@ -81,7 +113,8 @@ export const chat = onRequest(
     }
 
     const uid = decodedToken.uid;
-    const { message, role, conversationId, language, topic } = req.body ?? {};
+    const { message, role, conversationId, language, topic, code } =
+      req.body ?? {};
 
     if (typeof message !== "string" || !message.trim()) {
       res.status(400).json({ error: "`message` is required." });
@@ -122,6 +155,11 @@ export const chat = onRequest(
 
     let conversationRef;
     let priorMessages = [];
+    // The lesson this conversation is anchored to. For a new conversation it's
+    // the language/topic from the request; for an existing one we trust the
+    // conversation doc (authoritative) so the lesson context can't drift.
+    let lessonLanguage = language;
+    let lessonTopic = topic;
 
     try {
       if (conversationId) {
@@ -131,11 +169,22 @@ export const chat = onRequest(
           res.status(404).json({ error: "Conversation not found." });
           return;
         }
+        const convData = snapshot.data();
+        lessonLanguage = convData.language ?? language;
+        lessonTopic = convData.topic ?? topic;
+
         const messagesSnapshot = await conversationRef
           .collection("messages")
           .orderBy("createdAt", "asc")
           .get();
-        priorMessages = messagesSnapshot.docs.map((doc) => doc.data());
+        // Drop error placeholders and empty turns so they don't pollute the
+        // context, then keep only the most recent MAX_HISTORY_MESSAGES.
+        priorMessages = messagesSnapshot.docs
+          .map((doc) => doc.data())
+          .filter(
+            (m) => !m.error && typeof m.content === "string" && m.content.trim()
+          )
+          .slice(-MAX_HISTORY_MESSAGES);
       } else {
         // New conversation: key it to its curriculum topic so the client can
         // resume it by re-selecting the topic (topicKey = "<language>::<topic>").
@@ -168,13 +217,28 @@ export const chat = onRequest(
 
     const openai = new OpenAI({ apiKey: openaiKey.value() });
 
-    // Full prior conversation + the new user message, behind the active
-    // persona's system prompt.
+    // The active persona, scoped to the lesson (language + topic). For code
+    // roles, attach the student's current sandbox as an extra context block.
+    // Then the windowed prior conversation + the new user message.
     const openaiMessages = [
-      { role: "system", content: systemMessage },
-      ...priorMessages.map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: message },
+      {
+        role: "system",
+        content: buildSystemPrompt(role, {
+          language: lessonLanguage,
+          topic: lessonTopic,
+        }),
+      },
     ];
+
+    const codeContext = CODE_ROLES.has(role) ? buildCodeContext(code) : null;
+    if (codeContext) {
+      openaiMessages.push({ role: "system", content: codeContext });
+    }
+
+    openaiMessages.push(
+      ...priorMessages.map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: message }
+    );
 
     let assistantBuffer = "";
 
@@ -183,6 +247,10 @@ export const chat = onRequest(
         model: "gpt-4o-mini",
         messages: openaiMessages,
         stream: true,
+        // Modest temperature for consistent, focused teaching answers; cap the
+        // length to bound cost and latency. Tune to taste.
+        temperature: 0.5,
+        max_tokens: 1024,
       });
 
       res.writeHead(200, {
