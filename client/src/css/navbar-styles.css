@@ -73,7 +73,13 @@ body.light-mode {
 .toggle-btn,
 .close-btn {
   position: fixed;
-  top: 20px;
+  /* Occupy a band the height of the top bar and center the glyph in it, so the
+     icon lines up with the 56px top bar instead of floating slightly low.
+     line-height (not flex) does the centering — navbar.js toggles these via
+     inline display: block/none, which would override display: flex. */
+  top: 0;
+  height: 56px;
+  line-height: 56px;
   left: 20px;
   cursor: pointer;
   color: var(--js-yellow);
