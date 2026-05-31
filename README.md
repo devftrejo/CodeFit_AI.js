@@ -235,7 +235,7 @@ For any questions, or for more information, please reach out via our company's G
        <a href="mailto:darkmodedevs@gmail.com">
          <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail Badge"/>
        </a>
-       <a href="https://discord.gg/2D8pARQFjt">
+       <a href="https://discord.gg/HRYrHh9N5u">
          <img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Badge"/>
        </a>
    </div>
