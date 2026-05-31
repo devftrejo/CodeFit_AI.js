@@ -3,17 +3,15 @@
   "private": true,
   "type": "module",
   "version": "1.0.0",
-  "description": "${DarkMode} Devs' online AI bootcamp — root workspace for the Vite client and Express server.",
+  "description": "${DarkMode} Devs' online AI bootcamp — root workspace for the Vite client and Cloud Functions for Firebase backend.",
   "author": "Fernando Trejo",
   "license": "UNLICENSED",
   "workspaces": [
     "client",
-    "server",
     "functions"
   ],
   "scripts": {
     "dev": "concurrently -n client,emulators -c yellow,cyan \"npm run dev -w client\" \"firebase emulators:start --only functions,auth,firestore\"",
-    "dev:legacy": "concurrently -n client,server -c yellow,cyan \"npm run dev -w client\" \"npm run watch -w server\"",
     "build": "npm run build -w client",
     "preview": "npm run preview -w client",
     "emulators": "firebase emulators:start",

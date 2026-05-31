@@ -1,8 +1,9 @@
-// Thin wrapper around the streaming chat endpoint. Defaults to the
-// same-origin /api/chat path, which:
-//   - in dev, Vite proxies to the Functions emulator (see client/vite.config.js)
-//   - in prod, Firebase Hosting rewrites to the chat Cloud Function
-// Set VITE_API_URL in client/.env only to override (e.g. non-Firebase deploy).
+// Thin wrapper around the streaming chat endpoint. The URL is VITE_API_URL
+// when set, otherwise the relative /api/chat:
+//   - dev: unset -> /api/chat, which the Vite proxy forwards to the Functions
+//     emulator (see client/vite.config.js).
+//   - prod: VITE_API_URL (client/.env.production) points at the Cloud Function
+//     directly, because Firebase Hosting buffers SSE from its /api/chat rewrite.
 
 import { getIdToken } from "./auth.js";
 

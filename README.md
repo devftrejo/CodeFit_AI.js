@@ -32,9 +32,6 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
          <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node JS Badge"/>
        </a>
        <a href="">
-         <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" alt="Express JS Badge"/>
-       </a>
-       <a href="">
          <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase Badge"/>
        </a>
    </div>
@@ -44,11 +41,10 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 
 ## Repository Layout
 
-This repo is an **npm workspace** with three packages:
+This repo is an **npm workspace** with two packages:
 
 ```
 client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
-server/      Express API — POST / endpoint, OpenAI streaming. Transitional: superseded by functions/; removed in Phase 7.
 functions/   Cloud Functions for Firebase (v2, ESM). The chat handler: auth, OpenAI streaming, and Firestore persistence.
 ```
 
@@ -102,7 +98,6 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
      OPENAI_API_KEY=sk-...
      ```
 
-   - `server/.env` — only for the legacy Express flow (`npm run dev:legacy`); same `OPENAI_API_KEY`. Removed with `server/` in Phase 7.
    - `client/.env` — optional. `VITE_API_URL` overrides the chat endpoint; not needed for normal dev (defaults to `/api/chat` → emulator) or prod (set in `client/.env.production`). See `client/.env.example`.
 
 4. **Firebase setup** (the Firebase CLI runs the emulators for local dev and performs deploys):
@@ -155,12 +150,6 @@ npm run dev -w client      # Vite client only
 npm run emulators          # Firebase emulator suite only
 ```
 
-The legacy Vite + Express flow is still available until `server/` is removed in Phase 7 (point `client/.env` at `http://localhost:3000/` via `VITE_API_URL`):
-
-```sh
-npm run dev:legacy         # Vite + Nodemon-restarted Express server
-```
-
 ### Formatting & Linting
 
 Prettier and ESLint are wired up at the repo root. Run before committing:
@@ -168,7 +157,7 @@ Prettier and ESLint are wired up at the repo root. Run before committing:
 ```sh
 npm run format         # write formatting changes
 npm run format:check   # check without writing
-npm run lint           # ESLint over client/, server/, and functions/
+npm run lint           # ESLint over client/ and functions/
 ```
 
 ### Production Build & Preview

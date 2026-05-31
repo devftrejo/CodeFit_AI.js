@@ -1,6 +1,7 @@
 {
   "name": "codefit_ai.js-client",
   "version": "1.0.0",
+  "private": true,
   "main": "index.html",
   "scripts": {
     "dev": "vite",
@@ -10,8 +11,8 @@
   },
   "keywords": [],
   "author": "Fernando Trejo",
-  "license": "ISC",
-  "description": "",
+  "license": "UNLICENSED",
+  "description": "Vite MPA client for CodeFit_AI.js — chat UI + in-browser HTML/CSS/JS sandbox.",
   "devDependencies": {
     "vite": "^8.0.13"
   },
