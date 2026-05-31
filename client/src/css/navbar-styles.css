@@ -125,6 +125,10 @@ ul.submenu li {
 
 .submenu.active {
   max-height: 500px;
+  /* Scroll within the dropdown when expanded content exceeds the cap (e.g. all
+     three Curriculum languages open at once) instead of clipping it out of
+     reach. overflow-x stays hidden from the ul.submenu base rule. */
+  overflow-y: auto;
   border: 1px solid var(--js-yellow);
 }
 
