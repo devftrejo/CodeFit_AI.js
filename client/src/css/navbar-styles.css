@@ -87,8 +87,10 @@ body.light-mode {
 }
 
 .close-btn {
-  left: unset;
-  right: 20px;
+  /* Pin to the top-right of the 300px-wide navbar (~20px in from its right
+     edge), not the screen — otherwise the ✕ floats off the open panel. */
+  left: 260px;
+  right: unset;
 }
 
 .overlay {
