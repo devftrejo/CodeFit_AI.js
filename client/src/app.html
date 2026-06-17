@@ -238,7 +238,15 @@
             </div>
             <div class="preview-console">
               <div class="editor-label-right">Dev Preview</div>
-              <iframe id="preview" title="Live preview"></iframe>
+              <!-- Sandboxed so previewed code runs in an isolated origin and
+                   can't reach the app's Firebase session/storage. Scripts +
+                   modals/popups/forms stay enabled so learner demos work;
+                   allow-same-origin is deliberately omitted. -->
+              <iframe
+                id="preview"
+                title="Live preview"
+                sandbox="allow-scripts allow-modals allow-popups allow-forms"
+              ></iframe>
               <div class="editor-label-right">Console</div>
               <div id="console"></div>
             </div>

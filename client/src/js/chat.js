@@ -1,8 +1,17 @@
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
 import { getEditorContents } from "./editor.js";
+
+// Chat content (AI replies, replayed history, the user's own input) is rendered
+// as Markdown -> HTML and injected via innerHTML. marked does NOT sanitize, so
+// run its output through DOMPurify first; otherwise crafted/prompt-injected
+// content could inject scripts or event handlers (XSS) into the page.
+function renderMarkdown(content) {
+  return DOMPurify.sanitize(marked.parse(content));
+}
 
 // systemMessages now lives on the server (functions/prompts.js); the client
 // only tracks which role key to send.
@@ -42,7 +51,7 @@ function addMessage(content, isUser = false) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("message");
   messageElement.classList.add(isUser ? "user-message" : "bot-message");
-  messageElement.innerHTML = marked.parse(content);
+  messageElement.innerHTML = renderMarkdown(content);
 
   chatMessages.appendChild(messageElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -82,7 +91,7 @@ async function sendMessage(customMessage = null) {
       code,
       onChunk: (chunk) => {
         botReply += chunk;
-        botMessageElement.innerHTML = marked.parse(botReply);
+        botMessageElement.innerHTML = renderMarkdown(botReply);
         chatMessages.scrollTop = chatMessages.scrollHeight;
       },
     });

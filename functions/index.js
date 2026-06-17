@@ -42,6 +42,15 @@ const CODE_ROLES = new Set(["codeExplainer", "debugger", "optimizationExpert"]);
 const MAX_CODE_CHARS = 4000; // per editor pane
 const MAX_HISTORY_MESSAGES = 20; // most recent stored messages replayed as context
 
+// Per-user rate limit on the chat endpoint — bounds OpenAI cost/abuse from a
+// signed-in account. Fixed windows tracked in Firestore (rateLimits/{uid}) so
+// the cap is global across all function instances; an in-memory counter would
+// only limit per-instance (up to maxInstances× the cap). Tune to taste.
+const RATE_LIMIT_PER_MINUTE = 20;
+const RATE_LIMIT_PER_DAY = 300;
+const MINUTE_MS = 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 // Build a context block from the student's sandbox code. Only non-empty panes
 // are included; each is capped at MAX_CODE_CHARS. Returns null when there's
 // nothing to send.
@@ -64,6 +73,61 @@ function buildCodeContext(code) {
     "The student's current sandbox code is below. Base your help on it.\n\n" +
     parts.join("\n\n")
   );
+}
+
+// Fixed-window per-user rate limit keyed by uid. Returns
+// { allowed, retryAfterSeconds }. Stored under rateLimits/{uid}, which no
+// Firestore rule grants the client (default-deny), so only this Admin SDK code
+// can read/write it. Fails OPEN on a Firestore error — the limit is a cost
+// guard, not a security boundary, so a transient datastore issue shouldn't take
+// chat down.
+async function checkRateLimit(uid) {
+  const ref = db.collection("rateLimits").doc(uid);
+  try {
+    return await db.runTransaction(async (tx) => {
+      const snapshot = await tx.get(ref);
+      const now = Date.now();
+      const data = snapshot.exists ? snapshot.data() : {};
+      let minuteStart = data.minuteStart ?? 0;
+      let minuteCount = data.minuteCount ?? 0;
+      let dayStart = data.dayStart ?? 0;
+      let dayCount = data.dayCount ?? 0;
+
+      // Reset a window once it has elapsed.
+      if (now - minuteStart >= MINUTE_MS) {
+        minuteStart = now;
+        minuteCount = 0;
+      }
+      if (now - dayStart >= DAY_MS) {
+        dayStart = now;
+        dayCount = 0;
+      }
+
+      if (minuteCount >= RATE_LIMIT_PER_MINUTE) {
+        return {
+          allowed: false,
+          retryAfterSeconds: Math.ceil((minuteStart + MINUTE_MS - now) / 1000),
+        };
+      }
+      if (dayCount >= RATE_LIMIT_PER_DAY) {
+        return {
+          allowed: false,
+          retryAfterSeconds: Math.ceil((dayStart + DAY_MS - now) / 1000),
+        };
+      }
+
+      tx.set(ref, {
+        minuteStart,
+        minuteCount: minuteCount + 1,
+        dayStart,
+        dayCount: dayCount + 1,
+      });
+      return { allowed: true };
+    });
+  } catch (error) {
+    console.error("Rate-limit check failed (failing open):", error);
+    return { allowed: true };
+  }
 }
 
 export const chat = onRequest(
@@ -142,6 +206,17 @@ export const chat = onRequest(
       res.status(400).json({
         error:
           "A curriculum `language` and `topic` are required to start a conversation.",
+      });
+      return;
+    }
+
+    // Cost guard: bound how often a single account can hit the endpoint. Checked
+    // after validation (so malformed requests don't consume quota) but before
+    // any conversation writes or the OpenAI call.
+    const rate = await checkRateLimit(uid);
+    if (!rate.allowed) {
+      res.set("Retry-After", String(rate.retryAfterSeconds)).status(429).json({
+        error: "Rate limit exceeded. Please slow down and try again shortly.",
       });
       return;
     }
@@ -244,13 +319,21 @@ export const chat = onRequest(
 
     try {
       const stream = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-5.4-mini",
         messages: openaiMessages,
         stream: true,
-        // Modest temperature for consistent, focused teaching answers; cap the
-        // length to bound cost and latency. Tune to taste.
-        temperature: 0.5,
-        max_tokens: 1024,
+        // gpt-5.4-mini is a reasoning model, so it differs from gpt-4o-mini:
+        //  - It uses `max_completion_tokens` (not `max_tokens`).
+        //  - It only accepts the default temperature, so `temperature` is omitted.
+        //  - `reasoning_effort` ranges none|low|medium|high|xhigh. "none" makes
+        //    it behave like the old non-reasoning gpt-4o-mini — fastest, cheapest,
+        //    and it spends no reasoning tokens (which bill as output) — a good fit
+        //    for a snappy teaching assistant. Raise to "low"+ for deeper coding
+        //    help at higher latency/cost.
+        // With reasoning off, the whole budget is visible output; 2048 leaves
+        // room for code-heavy answers while bounding cost (output is $4.50/MTok).
+        max_completion_tokens: 2048,
+        reasoning_effort: "none",
       });
 
       res.writeHead(200, {

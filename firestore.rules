@@ -43,5 +43,12 @@ service cloud.firestore {
         allow read, write: if isOwner(uid);
       }
     }
+
+    // Per-user chat rate-limit counters, written only by the chat function's
+    // Admin SDK. Explicitly deny all client access (these paths are already
+    // default-deny; this documents and enforces the intent).
+    match /rateLimits/{uid} {
+      allow read, write: if false;
+    }
   }
 }

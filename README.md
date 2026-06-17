@@ -44,7 +44,7 @@ Only ${DarkMode} Devs company developers are authorized to use this code for the
 This repo is an **npm workspace** with two packages:
 
 ```
-client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + Font Awesome (all bundled from npm)
+client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + DOMPurify + Font Awesome (all bundled from npm)
 functions/   Cloud Functions for Firebase (v2, ESM). The chat handler: auth, OpenAI streaming, and Firestore persistence.
 ```
 
@@ -182,7 +182,7 @@ npm run firebase:deploy
 **One-time setup before the first deploy** (Firebase / Cloud console):
 
 - Project on the **Blaze** plan (Cloud Functions requirement).
-- OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above).
+- OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above). The key's account must be on an OpenAI usage tier that supports the configured model (`gpt-5.4-mini` needs Tier 1+; the Free tier can't call it).
 - If the function URL returns a Google **403** after deploying, enable Cloud Run → `chat` → **Allow unauthenticated invocations** (auth is still enforced in-function via the Firebase token).
 - Email/Password + Google enabled under Authentication → Sign-in method.
 
