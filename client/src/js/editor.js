@@ -11,6 +11,31 @@ import { oneDark } from "@codemirror/theme-one-dark";
 // from a single source of truth (see changeTheme below).
 const themeCompartment = new Compartment();
 
+// "Elegant" — an explicit light editor theme. Previously this was "no theme",
+// which left the editor background transparent so it inherited the page; in
+// light mode the container repaints to a light gray (.light-mode .container)
+// and CodeMirror's default token colors washed out against it. Giving Elegant
+// its own white background + dark text (like oneDark does for "Midnight") keeps
+// the editor readable regardless of the page's light/dark mode. The default
+// syntax highlighting from basicSetup still applies on top of this.
+const elegantTheme = EditorView.theme(
+  {
+    "&": { backgroundColor: "#ffffff", color: "#1b1b3b" },
+    ".cm-content": { caretColor: "#1b1b3b" },
+    ".cm-cursor, .cm-dropCursor": { borderLeftColor: "#1b1b3b" },
+    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
+      { backgroundColor: "#d1e7ff" },
+    ".cm-activeLine": { backgroundColor: "rgba(27, 27, 59, 0.05)" },
+    ".cm-gutters": {
+      backgroundColor: "#f5f5f5",
+      color: "#6c6c6c",
+      border: "none",
+    },
+    ".cm-activeLineGutter": { backgroundColor: "rgba(27, 27, 59, 0.08)" },
+  },
+  { dark: false }
+);
+
 const updatePreviewListener = EditorView.updateListener.of((update) => {
   if (update.docChanged) updatePreview();
 });
@@ -96,8 +121,8 @@ function clearConsole() {
 
 function changeTheme() {
   const theme = themeSelect.value;
-  // "Elegant" = CM6's default light look (no theme extension applied).
-  const themeExt = theme === "elegant" ? [] : oneDark;
+  // "Elegant" = our self-contained light theme; "Midnight" = oneDark.
+  const themeExt = theme === "elegant" ? elegantTheme : oneDark;
   [htmlEditor, cssEditor, jsEditor].forEach((editor) => {
     editor.dispatch({ effects: themeCompartment.reconfigure(themeExt) });
   });
