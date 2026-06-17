@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreBinaries": ["firebase"],
+  "workspaces": {
+    "client": {
+      "entry": ["src/js/entries/*.js"],
+      "project": ["**/*.js"]
+    }
+  }
+}

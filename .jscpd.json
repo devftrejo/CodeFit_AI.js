@@ -1,0 +1,8 @@
+{
+  "path": ["client/src", "functions"],
+  "format": ["javascript", "css", "markup"],
+  "ignore": ["**/node_modules/**", "**/dist/**"],
+  "minTokens": 50,
+  "minLines": 5,
+  "reporters": ["console"]
+}

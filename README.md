@@ -60,7 +60,7 @@ The client ships five pages:
 - `/contact.html` — contact
 - `/sign-in.html` — sign-in / create-account (Email/Password + Google)
 
-All five share a top-bar nav. The chat app additionally has an off-canvas navbar for the Conversations, Curriculum, and AI Roles menus.
+All five share a top-bar nav. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
 
 ## Getting Started
 
@@ -85,7 +85,7 @@ If either is missing or out of date, install or update Node from [nodejs.org](ht
 
    (replace `"repository-url"` with the actual URL).
 
-2. **Install dependencies from the repo root** — one command installs all three packages:
+2. **Install dependencies from the repo root** — one command installs both packages:
 
    ```sh
    npm install
@@ -150,15 +150,19 @@ npm run dev -w client      # Vite client only
 npm run emulators          # Firebase emulator suite only
 ```
 
-### Formatting & Linting
+### Formatting, Linting & Code Health
 
-Prettier and ESLint are wired up at the repo root. Run before committing:
+Prettier, ESLint, knip, and jscpd are wired up at the repo root. Run before committing:
 
 ```sh
 npm run format         # write formatting changes
 npm run format:check   # check without writing
-npm run lint           # ESLint over client/ and functions/
+npm run lint           # ESLint (incl. duplicate/dead-code rules) over client/ and functions/
+npm run knip           # report unused files, exports, and dependencies
+npm run jscpd          # report copy-pasted code blocks across JS/CSS/HTML
 ```
+
+ESLint (with `eslint-plugin-sonarjs`), knip, and jscpd together catch dead/unused and duplicated code. The latter three are report-only — they surface findings but don't fail the build.
 
 ### Production Build & Preview
 
