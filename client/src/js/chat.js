@@ -58,6 +58,43 @@ function addMessage(content, isUser = false) {
   return messageElement;
 }
 
+// Reveal a bot message progressively, the way live AI replies stream in, so
+// hard-coded bot text (the intro, role announcements) doesn't pop in all at
+// once. Re-renders sanitized Markdown each step — identical to the live path —
+// and resolves when fully shown. Cancels itself if the bubble gets removed
+// (e.g. a topic is opened, clearing the chat).
+function streamBotMessage(content, { wordDelay = 30 } = {}) {
+  const element = addMessage("", false);
+
+  // Honor reduced-motion preferences: skip the animation, show it immediately.
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    element.innerHTML = renderMarkdown(content);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return Promise.resolve();
+  }
+
+  // Words with their trailing whitespace, so spacing and newlines (and thus the
+  // Markdown structure) survive as the text builds up.
+  const tokens = content.match(/\S+\s*/g) ?? [];
+  let shown = "";
+  let index = 0;
+
+  return new Promise((resolve) => {
+    const step = () => {
+      if (!element.isConnected || index >= tokens.length) {
+        resolve();
+        return;
+      }
+      shown += tokens[index];
+      index += 1;
+      element.innerHTML = renderMarkdown(shown);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      setTimeout(step, wordDelay);
+    };
+    step();
+  });
+}
+
 // Friendly copy for a 429 from the chat endpoint, using the server's retry hint
 // (seconds) when it's available.
 function rateLimitMessage(retryAfterSeconds) {
@@ -160,8 +197,10 @@ function updateSelectedRole(role, { announce = true } = {}) {
 
   if (announce) {
     if (ROLE_LABELS[role]) {
-      addMessage(`AI role changed to: ${ROLE_LABELS[role].title}`, false);
-      addMessage(ROLE_LABELS[role].prompt, false);
+      // Stream the announcement like a real reply, then the prompt after it.
+      streamBotMessage(`AI role changed to: ${ROLE_LABELS[role].title}`).then(
+        () => streamBotMessage(ROLE_LABELS[role].prompt)
+      );
     }
     // `announce` marks an explicit AI Roles menu pick (vs a silent change from
     // curriculum selection or restoring the saved preference on load), so this
@@ -221,7 +260,11 @@ export function openTopic({ language, topic, conversationId, messages }) {
 }
 
 function aiIntroduction() {
-  setTimeout(() => addMessage(INTRO_MESSAGE, false), 1000);
+  setTimeout(() => {
+    // If a topic was opened during the delay, the intro is no longer relevant.
+    if (activeTopic) return;
+    streamBotMessage(INTRO_MESSAGE);
+  }, 1000);
 }
 
 sendButton.addEventListener("click", () => sendMessage());
