@@ -47,6 +47,21 @@ export async function streamChat({
   });
 
   if (!response.ok) {
+    if (response.status === 429) {
+      // Rate limited. The Retry-After header isn't CORS-exposed on the
+      // cross-origin prod call, so read the hint from the JSON body instead.
+      let retryAfterSeconds = null;
+      try {
+        const body = await response.json();
+        retryAfterSeconds = body?.retryAfterSeconds ?? null;
+      } catch {
+        // Body wasn't JSON; leave the hint null and use generic copy.
+      }
+      const error = new Error("rate_limited");
+      error.code = "rate_limited";
+      error.retryAfterSeconds = retryAfterSeconds;
+      throw error;
+    }
     throw new Error(`Chat request failed: ${response.status}`);
   }
 

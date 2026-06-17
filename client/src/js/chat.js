@@ -58,6 +58,21 @@ function addMessage(content, isUser = false) {
   return messageElement;
 }
 
+// Friendly copy for a 429 from the chat endpoint, using the server's retry hint
+// (seconds) when it's available.
+function rateLimitMessage(retryAfterSeconds) {
+  let wait = "a moment";
+  if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+    if (retryAfterSeconds < 60) {
+      wait = `${retryAfterSeconds} second${retryAfterSeconds === 1 ? "" : "s"}`;
+    } else {
+      const minutes = Math.ceil(retryAfterSeconds / 60);
+      wait = `${minutes} minute${minutes === 1 ? "" : "s"}`;
+    }
+  }
+  return `**Slow down a moment.** You're sending messages too quickly — please wait ${wait} and try again.`;
+}
+
 async function sendMessage(customMessage = null) {
   // No topic, no chat — the input is disabled in this state, but guard anyway.
   if (!activeTopic) return;
@@ -100,7 +115,17 @@ async function sendMessage(customMessage = null) {
     }
   } catch (error) {
     console.error("Error:", error);
-    addMessage("An error occurred while processing your request.");
+    const text =
+      error?.code === "rate_limited"
+        ? rateLimitMessage(error.retryAfterSeconds)
+        : "An error occurred while processing your request.";
+    // If nothing streamed yet, replace the empty bot bubble with the notice;
+    // otherwise keep the partial reply and add the notice as its own message.
+    if (botReply) {
+      addMessage(text, false);
+    } else {
+      botMessageElement.innerHTML = renderMarkdown(text);
+    }
   }
 }
 

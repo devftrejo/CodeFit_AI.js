@@ -215,8 +215,12 @@ export const chat = onRequest(
     // any conversation writes or the OpenAI call.
     const rate = await checkRateLimit(uid);
     if (!rate.allowed) {
+      // Send the retry hint both as the standard Retry-After header (for proxies
+      // / non-browser clients) and in the body — the header isn't CORS-exposed,
+      // so the cross-origin browser client reads it from the body instead.
       res.set("Retry-After", String(rate.retryAfterSeconds)).status(429).json({
         error: "Rate limit exceeded. Please slow down and try again shortly.",
+        retryAfterSeconds: rate.retryAfterSeconds,
       });
       return;
     }
