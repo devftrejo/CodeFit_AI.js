@@ -7,7 +7,7 @@ export function getTheme() {
   return localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark";
 }
 
-export function applyTheme(theme) {
+function applyTheme(theme) {
   document.body.classList.toggle("light-mode", theme === "light");
 }
 

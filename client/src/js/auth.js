@@ -33,10 +33,6 @@ export function onAuthChange(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-export function getCurrentUser() {
-  return auth.currentUser;
-}
-
 // Returns null if signed out, otherwise a fresh ID token (auto-refreshed by
 // the SDK when nearing expiry).
 export async function getIdToken() {

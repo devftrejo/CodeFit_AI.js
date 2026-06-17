@@ -60,7 +60,7 @@ The client ships five pages:
 - `/contact.html` — contact
 - `/sign-in.html` — sign-in / create-account (Email/Password + Google)
 
-All five share a top-bar nav. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
+All five share a top-bar nav. The shared `<head>` and top-bar markup are authored once as Handlebars partials in `client/src/partials/` and included into each page via `vite-plugin-handlebars` (rendered at build time), so they aren't copy-pasted across pages. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
 
 ## Getting Started
 
