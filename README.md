@@ -45,7 +45,7 @@ This repo is an **npm workspace** with two packages:
 
 ```
 client/      Vite MPA — vanilla JS ES modules, CodeMirror 6 + marked + DOMPurify + Font Awesome (all bundled from npm)
-functions/   Cloud Functions for Firebase (v2, ESM). The chat handler: auth, OpenAI streaming, and Firestore persistence.
+functions/   Cloud Functions for Firebase (v2, ESM) — the `chat` handler (auth, OpenAI streaming, Firestore persistence) plus the voice endpoints `transcribe`/`speak` (OpenAI STT/TTS). Shared auth + rate-limit guards live in `shared.js`.
 ```
 
 Most dependencies hoist to a single root `node_modules/`, so you install once at the repo root. (A few `functions/` deps stay local under `functions/node_modules/` because of npm version-resolution rules — that's normal and works both locally and on Firebase deploys.)
@@ -61,6 +61,8 @@ The client ships five pages:
 - `/sign-in.html` — sign-in / create-account (Email/Password + Google)
 
 All five share a top-bar nav. The shared `<head>` and top-bar markup are authored once as Handlebars partials in `client/src/partials/` and included into each page via `vite-plugin-handlebars` (rendered at build time), so they aren't copy-pasted across pages. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
+
+The app supports optional turn-based **voice** chat (speak a question, hear the reply back) and is **mobile-responsive**: the top bar and marketing pages adapt at a 1024px breakpoint, and under 1024px the app becomes a chat-only tutor (the CodeMirror editor is desktop-only and isn't even loaded on phones).
 
 ## Getting Started
 
@@ -182,8 +184,8 @@ npm run firebase:deploy
 **One-time setup before the first deploy** (Firebase / Cloud console):
 
 - Project on the **Blaze** plan (Cloud Functions requirement).
-- OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above). The key's account must be on an OpenAI usage tier that supports the configured model (`gpt-5.4-mini` needs Tier 1+; the Free tier can't call it).
-- If the function URL returns a Google **403** after deploying, enable Cloud Run → `chat` → **Allow unauthenticated invocations** (auth is still enforced in-function via the Firebase token).
+- OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above). The key's account must be on an OpenAI usage tier that supports the configured models — `gpt-5.4-mini` for chat (needs Tier 1+; the Free tier can't call it) plus the `gpt-4o-mini` audio models for voice.
+- If a function URL returns a Google **403** after deploying, enable Cloud Run → **Allow unauthenticated invocations** for each function the client calls directly (`chat`, `transcribe`, `speak`) — auth is still enforced in-function via the Firebase token.
 - Email/Password + Google enabled under Authentication → Sign-in method.
 
 **Prod streaming note:** the production client calls the Cloud Function **directly** (via `VITE_API_URL` in `client/.env.production`), not the `/api/chat` Hosting rewrite, because Hosting buffers Server-Sent Events. The function sets restricted CORS + `no-transform` so the stream isn't gzip-buffered by Google's frontend. See CLAUDE.md → "Deployment" for the full architecture and a troubleshooting table.
