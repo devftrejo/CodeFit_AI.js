@@ -22,16 +22,23 @@ onAuthChange(async (user) => {
   }
 
   // Signed in — load the app modules now that we know the user is allowed.
-  // curriculum.js imports chat.js + navbar.js; snippets.js imports
-  // editor.js + navbar.js; voice.js imports chat.js + api.js — those
-  // dependencies evaluate first.
-  await Promise.all([
+  // curriculum.js imports chat.js + navbar.js; voice.js imports chat.js +
+  // api.js — those dependencies evaluate first.
+  const modules = [
     import("../navbar.js"),
-    import("../editor.js"),
     import("../chat.js"),
     import("../curriculum.js"),
-    import("../snippets.js"),
     import("../profile.js"),
     import("../voice.js"),
-  ]);
+  ];
+
+  // The code editor + snippets are desktop-only: on mobile the app is a
+  // chat-first tutor, so skip those imports entirely (keeps the CodeMirror
+  // bundle off mobile). Mirrors the chat-only layout in the CSS. Crossing the
+  // breakpoint needs a reload to switch modes — acceptable for a rare event.
+  if (!window.matchMedia("(max-width: 1023px)").matches) {
+    modules.push(import("../editor.js"), import("../snippets.js"));
+  }
+
+  await Promise.all(modules);
 });

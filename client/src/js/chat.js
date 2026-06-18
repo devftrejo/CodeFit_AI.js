@@ -3,7 +3,6 @@ import DOMPurify from "dompurify";
 
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
-import { getEditorContents } from "./editor.js";
 import { db, auth } from "./firebase.js";
 import { collection, doc, getDocs, writeBatch } from "firebase/firestore";
 
@@ -150,9 +149,12 @@ export async function sendMessage(customMessage = null) {
   let botReply = "";
 
   // For code-focused roles, attach the current sandbox so the AI can work on
-  // what the learner actually wrote (only when a pane is non-empty).
+  // what the learner actually wrote (only when a pane is non-empty). The editor
+  // is imported lazily so it (and the CodeMirror bundle) stays out of the mobile
+  // build — code roles aren't reachable on mobile, so this never runs there.
   let code = null;
   if (CODE_ROLES.has(currentRole)) {
+    const { getEditorContents } = await import("./editor.js");
     const contents = getEditorContents();
     if (contents.html.trim() || contents.css.trim() || contents.js.trim()) {
       code = contents;

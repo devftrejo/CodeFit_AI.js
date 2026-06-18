@@ -14,9 +14,10 @@
         <h3 id="username">LadyBot</h3>
       </div>
       <ul>
-        <!-- Snippets (list populated by snippets.js; save lives on the editor) -->
+        <!-- Snippets (list populated by snippets.js; save lives on the editor).
+             Desktop-only — the editor isn't available on mobile. -->
 
-        <li>
+        <li class="desktop-only">
           <a href="#" class="submenu-toggle">
             <i class="fa-solid fa-bookmark"></i> Snippets
             <i class="fa-solid fa-chevron-down"></i>
@@ -144,9 +145,10 @@
           </ul>
         </li>
 
-        <!-- AI Roles -->
+        <!-- AI Roles (code personas) — desktop-only: these work on the editor
+             sandbox, which mobile doesn't load. -->
 
-        <li>
+        <li class="desktop-only">
           <a href="#" class="submenu-toggle">
             <i class="fa-solid fa-code-branch"></i>AI Roles
             <i class="fa-solid fa-chevron-down"></i>
@@ -222,7 +224,7 @@
           </p>
         </div>
       </div>
-      <div class="column-right">
+      <div class="column-right desktop-only">
         <div class="container midnight-theme">
           <div class="controls">
             <select id="theme-select" class="button">
