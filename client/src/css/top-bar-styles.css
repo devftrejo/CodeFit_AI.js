@@ -10,6 +10,23 @@
   background-color: var(--dark-gray);
   border-bottom: 1px solid var(--js-yellow);
   z-index: 500;
+  /* Anchor for the mobile nav dropdown (positioned absolute below the bar). */
+  position: relative;
+}
+
+/* Mobile menu toggle — hidden on desktop, where the nav is always inline. */
+.top-bar-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--js-yellow);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.light-mode .top-bar-menu-toggle {
+  color: var(--dark-gray);
 }
 
 .light-mode .top-bar {
@@ -78,4 +95,49 @@
 
 .light-mode #top-bar-light-toggle:hover {
   background-color: var(--light-blue);
+}
+
+/* Mobile (phones + portrait tablets): collapse the nav behind the toggle. The
+   nav drops down below the bar; the brand + toggle stay on the bar itself. */
+@media (max-width: 1023px) {
+  .top-bar-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .top-bar-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 8px 16px 16px;
+    background-color: var(--dark-gray);
+    border-bottom: 1px solid var(--js-yellow);
+  }
+
+  .light-mode .top-bar-nav {
+    background-color: var(--white);
+  }
+
+  .top-bar-nav.open {
+    display: flex;
+  }
+
+  /* Compact auth on mobile: drop the email, keep the action button/link. */
+  .top-bar-auth-email {
+    display: none;
+  }
+
+  .top-bar-auth {
+    align-self: flex-start;
+  }
+
+  #top-bar-light-toggle {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
 }

@@ -10,6 +10,9 @@ body.light-mode {
   top: 0;
   left: -300px;
   width: 300px;
+  /* On very narrow phones, leave a sliver of the page visible to tap-close
+     (the -300px hidden offset still fully clears it, since 85vw < 300px there). */
+  max-width: 85vw;
   height: 100%;
   background-color: var(--dark-gray);
   transition: 0.3s ease-in-out;

@@ -152,3 +152,27 @@
 .light-mode .contact-links a:hover {
   background-color: var(--light-blue);
 }
+
+/* Mobile: scale the hero/headings down and tighten section padding. The
+   value-props grid (auto-fit) and contact-links (flex-wrap) already reflow. */
+@media (max-width: 1023px) {
+  .marketing-section {
+    padding: 40px 20px;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero p.tagline {
+    font-size: 18px;
+  }
+
+  .marketing-section h2 {
+    font-size: 26px;
+  }
+
+  .value-props {
+    margin-top: 32px;
+  }
+}

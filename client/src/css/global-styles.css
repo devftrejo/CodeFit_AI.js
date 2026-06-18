@@ -7,6 +7,10 @@
 html,
 body {
   height: 100vh;
+  /* dvh tracks the *visible* viewport, so the app shell isn't clipped by mobile
+     browser chrome (address bar). Browsers without dvh fall back to the 100vh
+     above. */
+  height: 100dvh;
   width: 100vw;
   margin: 0;
   overflow: hidden;

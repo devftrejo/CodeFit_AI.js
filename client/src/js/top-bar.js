@@ -29,6 +29,33 @@ function bindLightToggle() {
   document.addEventListener("themechange", render);
 }
 
+// On mobile the nav collapses behind a toggle (it overflows the bar otherwise).
+// The button shows/hides the nav dropdown; it's hidden via CSS on desktop, where
+// the nav is always visible. Tapping a link or outside the menu closes it.
+function bindMenuToggle() {
+  const toggle = document.getElementById("top-bar-menu-toggle");
+  const nav = document.getElementById("top-bar-nav");
+  if (!toggle || !nav) return;
+
+  const setOpen = (open) => {
+    nav.classList.toggle("open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+  };
+
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setOpen(!nav.classList.contains("open"));
+  });
+  nav.addEventListener("click", (event) => {
+    if (event.target.closest("a")) setOpen(false);
+  });
+  document.addEventListener("click", (event) => {
+    if (!nav.contains(event.target) && !toggle.contains(event.target)) {
+      setOpen(false);
+    }
+  });
+}
+
 // Render the auth slot based on the current Firebase user. Re-renders whenever
 // auth state changes (sign-in, sign-out, token refresh that adds claims).
 function bindAuthSlot() {
@@ -77,4 +104,5 @@ function bindAuthSlot() {
 
 markActiveLink();
 bindLightToggle();
+bindMenuToggle();
 bindAuthSlot();
