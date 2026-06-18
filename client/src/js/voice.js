@@ -14,6 +14,7 @@ import { sendMessage } from "./chat.js";
 const micButton = document.getElementById("micButton");
 const userInput = document.getElementById("userInput");
 const voiceDisclaimer = document.getElementById("voiceDisclaimer");
+const chatMessages = document.getElementById("chatMessages");
 
 // `recorder` is set only while capturing; `chunks` collects the audio data
 // events. `busy` covers the whole turn (transcribe -> chat -> speak) so the mic
@@ -22,8 +23,15 @@ let recorder = null;
 let chunks = [];
 let busy = false;
 
-// Current playback, so a new turn (or a stop) can cut off a reply mid-sentence.
-let currentAudio = null;
+// Spoken-reply playback uses Web Audio. Browsers block audio that isn't tied to
+// a user gesture, and our reply plays seconds after the mic tap (post STT + chat
+// + TTS), so HTMLAudioElement autoplay is unreliable — especially on mobile.
+// Instead we resume a shared AudioContext *during* the mic tap (a gesture), which
+// unlocks it for the rest of the turn; a decoded buffer then plays without
+// restriction. `currentSource` is the in-flight reply so a new turn can cut it
+// off mid-sentence.
+let audioCtx = null;
+let currentSource = null;
 
 // MediaRecorder needs a container the browser can produce; they differ (Chrome
 // records webm, Safari mp4). Pick the first supported candidate.
@@ -59,27 +67,89 @@ function restMicState() {
   setMicState(userInput.disabled ? "unavailable" : "idle");
 }
 
-function stopPlayback() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = "";
-    currentAudio = null;
+function getAudioContext() {
+  if (!audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) audioCtx = new Ctx();
+  }
+  return audioCtx;
+}
+
+// Called from the mic tap (a user gesture) to unlock audio output for the turn's
+// eventual spoken reply. Resuming here, inside the gesture, is what lets the
+// later (gesture-less) playback through.
+function unlockAudio() {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
   }
 }
 
-// Play an audio Blob, revoking its object URL when done so blobs don't leak.
-function playAudio(blob) {
+function stopPlayback() {
+  if (currentSource) {
+    try {
+      currentSource.stop();
+    } catch {
+      // Already stopped/ended — nothing to do.
+    }
+    currentSource = null;
+  }
+}
+
+// Speak a reply: decode the MP3 and play it through the gesture-unlocked
+// AudioContext. If anything fails (no Web Audio, decode error, or the context
+// couldn't be unlocked), fall back to a tap-to-play control so the learner can
+// always hear the reply with a fresh gesture instead of it silently not playing.
+async function playReply(blob) {
   stopPlayback();
+  const ctx = getAudioContext();
+  if (!ctx) {
+    offerTapToPlay(blob);
+    return;
+  }
+
+  try {
+    if (ctx.state === "suspended") await ctx.resume();
+    const buffer = await ctx.decodeAudioData(await blob.arrayBuffer());
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.onended = () => {
+      if (currentSource === source) currentSource = null;
+    };
+    currentSource = source;
+    source.start();
+  } catch (error) {
+    console.warn(
+      "Auto playback unavailable; offering tap-to-play:",
+      error?.name || error
+    );
+    offerTapToPlay(blob);
+  }
+}
+
+// Fallback when auto playback is blocked: a one-tap control appended to the chat.
+// The tap is a fresh user gesture, so an <audio> element plays without restriction.
+function offerTapToPlay(blob) {
+  if (!chatMessages) return;
   const url = URL.createObjectURL(blob);
-  const audio = new Audio(url);
-  currentAudio = audio;
-  const cleanup = () => {
-    URL.revokeObjectURL(url);
-    if (currentAudio === audio) currentAudio = null;
-  };
-  audio.addEventListener("ended", cleanup, { once: true });
-  audio.addEventListener("error", cleanup, { once: true });
-  audio.play().catch(cleanup);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "voice-play-reply";
+  button.innerHTML =
+    '<i class="fa-solid fa-volume-high"></i> Tap to hear reply';
+  button.addEventListener("click", () => {
+    const audio = new Audio(url);
+    audio.addEventListener("ended", () => URL.revokeObjectURL(url), {
+      once: true,
+    });
+    audio.play().catch((error) => {
+      console.error("Manual playback failed:", error);
+    });
+    button.remove();
+  });
+  chatMessages.appendChild(button);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Run one voice turn from a recorded clip: STT -> chat -> spoken reply.
@@ -94,10 +164,17 @@ async function handleClip(blob) {
     // streams + persists the reply). It returns the reply text on success.
     const reply = await sendMessage(text);
     if (reply.trim()) {
-      playAudio(await synthesizeSpeech(reply));
+      // Synthesis/playback is isolated so a failure here (e.g. a rate-limited
+      // TTS call, or blocked autoplay) is reported distinctly and doesn't read
+      // as a transcription/chat failure — the text reply is already shown.
+      try {
+        await playReply(await synthesizeSpeech(reply));
+      } catch (error) {
+        console.error("Speech synthesis failed:", error);
+      }
     }
   } catch (error) {
-    console.error("Voice turn failed:", error);
+    console.error("Voice turn failed (transcription or chat):", error);
   } finally {
     busy = false;
     restMicState();
@@ -146,6 +223,9 @@ function stopRecording() {
 
 function onMicClick() {
   if (busy) return;
+  // This click is a user gesture — unlock audio output now so the spoken reply
+  // (which plays later, after the async STT/chat/TTS round-trip) is allowed.
+  unlockAudio();
   if (recorder) {
     stopRecording();
   } else {

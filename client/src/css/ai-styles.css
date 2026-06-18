@@ -49,6 +49,9 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  /* Only ever scroll vertically; bubbles wrap/scroll their own content. */
+  overflow-x: hidden;
+  min-width: 0;
   padding: 10px;
 }
 
@@ -106,6 +109,25 @@
   display: none;
 }
 
+/* Fallback control voice.js appends when a spoken reply can't auto-play (autoplay
+   blocked) — tapping it plays the reply with a fresh user gesture. */
+.voice-play-reply {
+  align-self: center;
+  margin: 4px 0 10px;
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid var(--js-yellow);
+  border-radius: 3px;
+  color: var(--js-yellow);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.voice-play-reply:hover {
+  background-color: var(--semi-black);
+}
+
 #userInput {
   flex: 1;
   padding: 5px;
@@ -133,6 +155,15 @@
   padding: 5px 10px;
   border-radius: 3px;
   max-width: 85%;
+  /* Break long words/URLs so a bubble can't push past the chat column on narrow
+     screens; min-width:0 lets it shrink as a flex item instead of overflowing. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.message img {
+  max-width: 100%;
+  height: auto;
 }
 
 .message p {
@@ -151,6 +182,9 @@
   border-radius: 3px;
   padding: 10px;
   margin: 10px 0;
+  /* Long code lines scroll within the block instead of overflowing the bubble. */
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .message code {
