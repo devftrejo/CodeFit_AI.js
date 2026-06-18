@@ -23,7 +23,8 @@ onAuthChange(async (user) => {
 
   // Signed in — load the app modules now that we know the user is allowed.
   // curriculum.js imports chat.js + navbar.js; snippets.js imports
-  // editor.js + navbar.js — those dependencies evaluate first.
+  // editor.js + navbar.js; voice.js imports chat.js + api.js — those
+  // dependencies evaluate first.
   await Promise.all([
     import("../navbar.js"),
     import("../editor.js"),
@@ -31,5 +32,6 @@ onAuthChange(async (user) => {
     import("../curriculum.js"),
     import("../snippets.js"),
     import("../profile.js"),
+    import("../voice.js"),
   ]);
 });

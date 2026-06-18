@@ -183,6 +183,17 @@
     <div class="row">
       <div class="column-left">
         <div class="container">
+          <div class="chat-header" id="chatHeader" hidden>
+            <span class="chat-topic" id="chatTopic"></span>
+            <button
+              id="clearHistory"
+              class="chat-header-btn"
+              title="Clear this topic's history"
+              disabled
+            >
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
           <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input">
             <input
@@ -190,10 +201,25 @@
               id="userInput"
               placeholder="Type your message..."
             />
+            <button
+              id="micButton"
+              class="button mic-button"
+              title="Record a voice message"
+              aria-label="Record a voice message"
+            >
+              <i class="fa-solid fa-microphone"></i>
+            </button>
             <button id="sendButton" class="button">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
           </div>
+          <!-- Required disclosure: OpenAI's usage policy mandates telling users
+               the spoken replies are AI-generated. voice.js unhides this only
+               when voice is actually available. -->
+          <p id="voiceDisclaimer" class="voice-disclaimer" hidden>
+            <i class="fa-solid fa-volume-high"></i> Voice replies are
+            AI-generated, not a human voice.
+          </p>
         </div>
       </div>
       <div class="column-right">

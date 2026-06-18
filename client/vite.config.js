@@ -49,16 +49,19 @@ export default defineConfig({
   },
   server: {
     port: 8080,
-    // Same-origin /api/chat works in dev (proxy to Functions emulator) and
-    // prod (Firebase Hosting rewrite to the deployed function), so client
-    // code can use a single relative path.
-    proxy: {
-      "/api/chat": {
-        target: FUNCTIONS_EMULATOR_TARGET,
-        changeOrigin: true,
-        rewrite: (path) =>
-          path.replace("/api/chat", `${FUNCTIONS_PATH_PREFIX}/chat`),
-      },
-    },
+    // Same-origin /api/<fn> works in dev (proxy to the Functions emulator) and
+    // prod (the client calls the functions directly via VITE_API_URL). One entry
+    // per function the client calls — chat plus the voice STT/TTS endpoints.
+    proxy: Object.fromEntries(
+      ["chat", "transcribe", "speak"].map((fn) => [
+        `/api/${fn}`,
+        {
+          target: FUNCTIONS_EMULATOR_TARGET,
+          changeOrigin: true,
+          rewrite: (path) =>
+            path.replace(`/api/${fn}`, `${FUNCTIONS_PATH_PREFIX}/${fn}`),
+        },
+      ])
+    ),
   },
 });

@@ -4,6 +4,8 @@ import DOMPurify from "dompurify";
 import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
 import { getEditorContents } from "./editor.js";
+import { db, auth } from "./firebase.js";
+import { collection, doc, getDocs, writeBatch } from "firebase/firestore";
 
 // Chat content (AI replies, replayed history, the user's own input) is rendered
 // as Markdown -> HTML and injected via innerHTML. marked does NOT sanitize, so
@@ -34,6 +36,9 @@ let activeTopic = null;
 const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");
 const sendButton = document.getElementById("sendButton");
+const chatHeader = document.getElementById("chatHeader");
+const chatTopicLabel = document.getElementById("chatTopic");
+const clearHistoryButton = document.getElementById("clearHistory");
 
 const NO_TOPIC_PLACEHOLDER =
   "Select a topic from the Curriculum menu to begin…";
@@ -45,6 +50,24 @@ function setInputEnabled(enabled) {
   userInput.disabled = !enabled;
   sendButton.disabled = !enabled;
   userInput.placeholder = enabled ? TOPIC_PLACEHOLDER : NO_TOPIC_PLACEHOLDER;
+  // voice.js mirrors this to gate the mic button (voice is only available once a
+  // topic is active, same as the text input).
+  document.dispatchEvent(
+    new CustomEvent("chat-input-enabled", { detail: { enabled } })
+  );
+}
+
+// Reflect the current topic in the chat header. The header stays hidden until a
+// topic is open; the clear-history button is enabled only once the topic has a
+// persisted conversation (currentConversationId) to delete.
+function updateChatHeader() {
+  if (activeTopic) {
+    chatTopicLabel.textContent = `${activeTopic.language} · ${activeTopic.topic}`;
+    chatHeader.hidden = false;
+  } else {
+    chatHeader.hidden = true;
+  }
+  clearHistoryButton.disabled = !currentConversationId;
 }
 
 function addMessage(content, isUser = false) {
@@ -110,12 +133,15 @@ function rateLimitMessage(retryAfterSeconds) {
   return `**Slow down a moment.** You're sending messages too quickly — please wait ${wait} and try again.`;
 }
 
-async function sendMessage(customMessage = null) {
+// Returns the assistant's full reply text on success, or "" if the turn was
+// skipped or errored — voice.js uses the return value to decide whether to speak
+// the reply back.
+export async function sendMessage(customMessage = null) {
   // No topic, no chat — the input is disabled in this state, but guard anyway.
-  if (!activeTopic) return;
+  if (!activeTopic) return "";
 
   const message = customMessage || userInput.value.trim();
-  if (!message) return;
+  if (!message) return "";
 
   addMessage(message, true);
   userInput.value = "";
@@ -149,7 +175,11 @@ async function sendMessage(customMessage = null) {
     });
     if (result?.conversationId) {
       currentConversationId = result.conversationId;
+      // The first message of a fresh topic creates its conversation — now there
+      // is history to clear, so enable the control.
+      updateChatHeader();
     }
+    return botReply;
   } catch (error) {
     console.error("Error:", error);
     const text =
@@ -163,6 +193,7 @@ async function sendMessage(customMessage = null) {
     } else {
       botMessageElement.innerHTML = renderMarkdown(text);
     }
+    return "";
   }
 }
 
@@ -257,6 +288,57 @@ export function openTopic({ language, topic, conversationId, messages }) {
     clearChat();
     sendMessage(`Explain the ${topic} topic in ${language}.`);
   }
+
+  updateChatHeader();
+}
+
+// Delete a conversation and all of its messages. The Firestore rules let the
+// owner delete both; the messages must go too so no orphaned subcollection is
+// left behind. Batched so the whole topic clears in one atomic write.
+async function deleteConversation(conversationId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  const conversationRef = doc(
+    db,
+    "users",
+    uid,
+    "conversations",
+    conversationId
+  );
+  const messagesSnap = await getDocs(collection(conversationRef, "messages"));
+  const batch = writeBatch(db);
+  messagesSnap.forEach((messageDoc) => batch.delete(messageDoc.ref));
+  batch.delete(conversationRef);
+  await batch.commit();
+}
+
+// Clear the active topic's saved history: delete its conversation, then restart
+// the topic fresh — same as opening a never-seen topic (re-runs the "Explain…"
+// kickoff). No-ops unless a topic with a persisted conversation is open.
+async function clearTopicHistory() {
+  if (!activeTopic || !currentConversationId) return;
+
+  const { language, topic } = activeTopic;
+  if (
+    !window.confirm(
+      `Clear your saved history for "${topic}"? This can't be undone.`
+    )
+  ) {
+    return;
+  }
+
+  clearHistoryButton.disabled = true;
+  try {
+    await deleteConversation(currentConversationId);
+  } catch (error) {
+    console.error("Clearing topic history failed:", error);
+    addMessage("**Couldn't clear this topic's history.** Please try again.");
+    clearHistoryButton.disabled = false;
+    return;
+  }
+
+  // Restart the topic from scratch, exactly like a first-time selection.
+  openTopic({ language, topic });
 }
 
 function aiIntroduction() {
@@ -273,6 +355,8 @@ userInput.addEventListener("keypress", (e) => {
     sendMessage();
   }
 });
+
+clearHistoryButton.addEventListener("click", clearTopicHistory);
 
 document.querySelectorAll(".role-option").forEach((option) => {
   option.addEventListener("click", (e) => {
