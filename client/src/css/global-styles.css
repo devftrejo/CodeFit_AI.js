@@ -41,11 +41,17 @@ body {
 .column-left {
   flex: 25%;
   padding: 10px;
+  /* Without min-width:0 a flex item won't shrink below its content's min-content
+     width, so a long unbreakable line (code/URL) inflates the whole column past
+     the viewport — and body's overflow:hidden then clips it off-screen. This is
+     what lets the inner wrap/scroll rules (ai-styles.css) actually contain it. */
+  min-width: 0;
 }
 
 .column-right {
   flex: 75%;
   padding: 10px;
+  min-width: 0;
 }
 
 /* Mobile app layout: chat-only. Hide the editor column and the editor-centric
