@@ -62,7 +62,7 @@ The client ships five pages:
 
 All five share a top-bar nav. The shared `<head>` and top-bar markup are authored once as Handlebars partials in `client/src/partials/` and included into each page via `vite-plugin-handlebars` (rendered at build time), so they aren't copy-pasted across pages. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
 
-The app supports optional turn-based **voice** chat (speak a question, hear the reply back) and is **mobile-responsive**: the top bar and marketing pages adapt at a 1024px breakpoint, and under 1024px the app becomes a chat-only tutor (the CodeMirror editor is desktop-only and isn't even loaded on phones).
+The app supports optional turn-based **voice** chat (speak a question, hear the reply back). Voice is off by default and lives behind a **voice-mode toggle**: turning it on plays a short spoken greeting that explains how to use the mic, then lets you talk to the AI; with it off, chat stays text-only. The app is also **mobile-responsive**: the top bar and marketing pages adapt at a 1024px breakpoint, and under 1024px the app becomes a chat-only tutor (the CodeMirror editor is desktop-only and isn't even loaded on phones).
 
 ## Getting Started
 
