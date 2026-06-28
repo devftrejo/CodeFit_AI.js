@@ -10,18 +10,24 @@
 
 import { transcribeAudio, synthesizeSpeech } from "./api.js";
 import { sendMessage } from "./chat.js";
+// Pre-generated spoken greeting (static asset → no per-load TTS cost). Played
+// when the user turns voice mode on; its narration explains how to use the mic.
+import greetingUrl from "../assets/greeting.mp3";
 
 const micButton = document.getElementById("micButton");
+const voiceModeButton = document.getElementById("voiceModeButton");
 const userInput = document.getElementById("userInput");
 const voiceDisclaimer = document.getElementById("voiceDisclaimer");
 const chatMessages = document.getElementById("chatMessages");
 
 // `recorder` is set only while capturing; `chunks` collects the audio data
 // events. `busy` covers the whole turn (transcribe -> chat -> speak) so the mic
-// can't be re-triggered mid-flight.
+// can't be re-triggered mid-flight. `voiceMode` gates the mic: off by default
+// (text-only, mic hidden), turned on by the voice-mode button.
 let recorder = null;
 let chunks = [];
 let busy = false;
+let voiceMode = false;
 
 // Spoken-reply playback uses Web Audio. Browsers block audio that isn't tied to
 // a user gesture, and our reply plays seconds after the mic tap (post STT + chat
@@ -233,31 +239,77 @@ function onMicClick() {
   }
 }
 
-function init() {
-  if (!micButton) return;
+// Play the pre-generated greeting (intro + mic instructions). Reuses the same
+// gesture-unlocked Web Audio path as spoken replies, with the tap-to-play
+// fallback if autoplay is blocked.
+async function playGreeting() {
+  try {
+    const response = await fetch(greetingUrl);
+    await playReply(await response.blob());
+  } catch (error) {
+    console.warn("Greeting playback unavailable:", error?.name || error);
+  }
+}
 
-  // Feature-detect: without MediaRecorder + getUserMedia, hide the mic entirely
-  // rather than offer a control that can't work (e.g. older/unsupported browsers).
+// Reflect voice mode on the button + reveal/hide the mic. Turning it on shows the
+// mic (subject to the topic gate) and the AI-voice disclosure; turning it off
+// hides the mic and stops any playback, returning to text-only chat.
+function setVoiceMode(on) {
+  voiceMode = on;
+  voiceModeButton.classList.toggle("active", on);
+  voiceModeButton.setAttribute("aria-pressed", String(on));
+  voiceModeButton.title = on ? "Turn off voice mode" : "Turn on voice mode";
+  voiceModeButton.setAttribute("aria-label", voiceModeButton.title);
+  if (voiceDisclaimer) voiceDisclaimer.hidden = !on;
+
+  if (on) {
+    micButton.hidden = false;
+    restMicState();
+  } else {
+    stopPlayback();
+    micButton.hidden = true;
+  }
+}
+
+function onVoiceModeClick() {
+  // Don't flip the mode mid-recording or mid-turn — it would yank the mic away.
+  if (busy || recorder) return;
+  if (voiceMode) {
+    setVoiceMode(false);
+  } else {
+    // This click is the user gesture that unlocks audio output, so the greeting
+    // (and later spoken replies) can play.
+    unlockAudio();
+    setVoiceMode(true);
+    playGreeting();
+  }
+}
+
+function init() {
+  if (!micButton || !voiceModeButton) return;
+
+  // Feature-detect: without MediaRecorder + getUserMedia, hide the voice controls
+  // entirely rather than offer something that can't work (older/unsupported
+  // browsers). Both buttons start hidden in the markup, so nothing to reveal.
   if (
     typeof MediaRecorder === "undefined" ||
     !navigator.mediaDevices?.getUserMedia
   ) {
-    micButton.hidden = true;
     return;
   }
 
   micButton.addEventListener("click", onMicClick);
-  restMicState();
+  voiceModeButton.addEventListener("click", onVoiceModeClick);
 
-  // Voice is available, so spoken replies can play — reveal the AI-voice
-  // disclosure that OpenAI's usage policy requires.
-  if (voiceDisclaimer) voiceDisclaimer.hidden = false;
+  // Voice is supported — show the voice-mode toggle. The mic and the AI-voice
+  // disclosure stay hidden until the user actually turns voice mode on.
+  voiceModeButton.hidden = false;
 
-  // Mirror the chat input's enabled state (gated on an active topic). Ignore
-  // changes mid-turn so a topic switch can't yank the button out from under a
-  // recording or in-flight request.
+  // Mirror the chat input's enabled state (gated on an active topic) while voice
+  // mode is on. Ignore changes mid-turn so a topic switch can't yank the mic out
+  // from under a recording or in-flight request.
   document.addEventListener("chat-input-enabled", () => {
-    if (busy || recorder) return;
+    if (!voiceMode || busy || recorder) return;
     restMicState();
   });
 }

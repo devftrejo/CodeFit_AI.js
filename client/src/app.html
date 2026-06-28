@@ -204,10 +204,21 @@
               placeholder="Type your message..."
             />
             <button
+              id="voiceModeButton"
+              class="button voice-mode-button"
+              title="Turn on voice mode"
+              aria-label="Turn on voice mode"
+              aria-pressed="false"
+              hidden
+            >
+              <i class="fa-solid fa-headphones"></i>
+            </button>
+            <button
               id="micButton"
               class="button mic-button"
               title="Record a voice message"
               aria-label="Record a voice message"
+              hidden
             >
               <i class="fa-solid fa-microphone"></i>
             </button>

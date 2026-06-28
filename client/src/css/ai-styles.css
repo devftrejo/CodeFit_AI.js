@@ -73,6 +73,14 @@
   width: 40px;
 }
 
+/* Voice mode button: toggles turn-based voice on/off (reveals the mic + plays the
+   spoken instructions). Inverts to dark-on-yellow while active so the on state is
+   obvious. (Base size comes from the shared .chat-input .button rule above.) */
+.voice-mode-button.active {
+  background-color: var(--midnight-black);
+  color: var(--js-yellow);
+}
+
 /* Mic button: turns red and pulses while recording; dims while a turn is in
    flight. (Base size comes from the shared .chat-input .button rule above.) */
 .mic-button.recording {

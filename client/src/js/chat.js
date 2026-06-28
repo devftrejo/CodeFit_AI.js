@@ -259,7 +259,10 @@ To keep you on track, every chat is anchored to a lesson. Pick a topic from the
 questions right here in that topic's thread.
 
 Already covered a topic? Re-select it from the menu to pick the conversation
-back up where you left off.`;
+back up where you left off.
+
+When you're ready to talk, click the microphone button and speak, then click it
+again when you're finished — I'll reply out loud.`;
 
 function clearChat() {
   chatMessages.innerHTML = "";
