@@ -96,9 +96,11 @@ body.light-mode {
 }
 
 .close-btn {
-  /* Pin to the top-right of the 300px-wide navbar (~20px in from its right
-     edge), not the screen — otherwise the ✕ floats off the open panel. */
-  left: 260px;
+  /* Pin ~20px in from the navbar's right edge, not the screen — otherwise the ✕
+     floats off the open panel. The panel is min(300px, 85vw) wide (the cap kicks
+     in on narrow phones), so track that width instead of a fixed 260px or the ✕
+     spills outside the panel on small screens. */
+  left: min(260px, calc(85vw - 40px));
   right: unset;
 }
 

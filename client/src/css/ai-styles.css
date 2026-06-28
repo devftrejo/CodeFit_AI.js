@@ -62,13 +62,19 @@
   padding: 10px;
 }
 
-/* Mic button: a compact square icon button (the send button keeps its width).
-   Turns red and pulses while recording; dims while a turn is in flight. */
-.mic-button {
+/* The mic and send buttons are icon-only, so size them as equal compact squares
+   (40px) instead of the shared .button's 100px width — that hands the rest of the
+   row to the text input. Also drop the .button margin-left (meant for the editor
+   toolbar; the row's `gap` spaces these) which otherwise pushed send off-screen on
+   narrow phones, and keep them from shrinking so the input absorbs reflow. */
+.chat-input .button {
+  margin-left: 0;
   flex-shrink: 0;
   width: 40px;
 }
 
+/* Mic button: turns red and pulses while recording; dims while a turn is in
+   flight. (Base size comes from the shared .chat-input .button rule above.) */
 .mic-button.recording {
   background-color: var(--error-red);
   color: var(--white);
@@ -130,6 +136,9 @@
 
 #userInput {
   flex: 1;
+  /* Allow the field to shrink below its intrinsic min-width so the mic + send
+     buttons always stay in-row instead of overflowing the chat column. */
+  min-width: 0;
   padding: 5px;
   border: 1px solid var(--js-yellow);
   border-radius: 3px;

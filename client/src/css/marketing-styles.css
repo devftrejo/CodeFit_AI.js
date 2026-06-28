@@ -120,15 +120,20 @@
 }
 
 .contact-links {
-  display: flex;
+  /* Two equal columns sized to the widest button, so both links always render
+     at the same width; the container only grows as wide as it needs to. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 24px;
-  flex-wrap: wrap;
+  width: max-content;
+  max-width: 100%;
 }
 
 .contact-links a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 12px 20px;
   background-color: var(--dark-gray);
@@ -154,7 +159,9 @@
 }
 
 /* Mobile: scale the hero/headings down and tighten section padding. The
-   value-props grid (auto-fit) and contact-links (flex-wrap) already reflow. */
+   value-props grid (auto-fit) already reflows. contact-links keeps its two
+   equal columns down through tablet widths (they only need ~580px) and only
+   collapses to one column on phones — see the narrower query below. */
 @media (max-width: 1023px) {
   .marketing-section {
     padding: 40px 20px;
@@ -174,5 +181,15 @@
 
   .value-props {
     margin-top: 32px;
+  }
+}
+
+/* Phones: the two contact buttons no longer fit side by side, so stack them
+   into a single full-width column — they stay equal width when stacked.
+   Tablets keep the desktop two-column layout (handled above). */
+@media (max-width: 600px) {
+  .contact-links {
+    grid-template-columns: 1fr;
+    width: 100%;
   }
 }
