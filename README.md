@@ -152,6 +152,17 @@ npm run dev -w client      # Vite client only
 npm run emulators          # Firebase emulator suite only
 ```
 
+### Testing
+
+Tests run on **Vitest** from the repo root:
+
+```sh
+npm test          # run the suite once
+npm run test:watch  # watch mode
+```
+
+Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, and the client's streaming/error-mapping — not full end-to-end coverage.
+
 ### Formatting, Linting & Code Health
 
 Prettier, ESLint, knip, and jscpd are wired up at the repo root. Run before committing:
@@ -187,6 +198,7 @@ npm run firebase:deploy
 - OpenAI secret set: `firebase functions:secrets:set OPENAI_API_KEY` (mind the Windows BOM caveat above). The key's account must be on an OpenAI usage tier that supports the configured models — `gpt-5.4-mini` for chat (needs Tier 1+; the Free tier can't call it) plus the `gpt-4o-mini` audio models for voice.
 - If a function URL returns a Google **403** after deploying, enable Cloud Run → **Allow unauthenticated invocations** for each function the client calls directly (`chat`, `transcribe`, `speak`) — auth is still enforced in-function via the Firebase token.
 - Email/Password + Google enabled under Authentication → Sign-in method.
+- **App Check** (reCAPTCHA v3) registered under Project settings → App Check, and the generated **site key** pasted into `RECAPTCHA_SITE_KEY` in `client/src/js/firebase.js` (public, safe to commit) **before** building/deploying. The functions verify an App Check token in prod, so the client must send one — deploy the client (with the key) and the functions **together**. App Check is enforced in prod only; local dev (emulators) skips it. See CLAUDE.md → "App Check" for the flow.
 
 **Prod streaming note:** the production client calls the Cloud Function **directly** (via `VITE_API_URL` in `client/.env.production`), not the `/api/chat` Hosting rewrite, because Hosting buffers Server-Sent Events. The function sets restricted CORS + `no-transform` so the stream isn't gzip-buffered by Google's frontend. See CLAUDE.md → "Deployment" for the full architecture and a troubleshooting table.
 
