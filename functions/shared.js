@@ -10,6 +10,7 @@
 import { defineSecret } from "firebase-functions/params";
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getAppCheck } from "firebase-admin/app-check";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { OpenAI } from "openai";
 
@@ -52,17 +53,45 @@ const RATE_LIMIT_PER_DAY = 300;
 const MINUTE_MS = 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Require POST + a valid Firebase token — the shared prologue for every handler.
-// Returns the uid to proceed, or null after writing the 405/401 onto `res` (the
-// caller should `return`). Endpoint-specific validation and the rate limit run
-// after this, so each handler controls their ordering — chat rate-limits only
-// after validating, so malformed requests don't consume quota.
+// Require POST + a valid App Check token + a valid Firebase ID token — the
+// shared prologue for every handler. Returns the uid to proceed, or null after
+// writing the 405/401 onto `res` (the caller should `return`). App Check
+// (attests the request is from our genuine app) is verified before auth
+// (attests the user), so a request from an unrecognized app is rejected before
+// any token work. Endpoint-specific validation and the rate limit run after
+// this, so each handler controls their ordering — chat rate-limits only after
+// validating, so malformed requests don't consume quota.
 export async function requirePostAuth(req, res) {
   if (req.method !== "POST") {
     res.set("Allow", "POST").status(405).json({ error: "Method not allowed" });
     return null;
   }
+  if (!(await verifyAppCheck(req, res))) return null;
   return authenticate(req, res);
+}
+
+// Verify the App Check token on a request (the X-Firebase-AppCheck header the
+// client attaches). Returns true to proceed, or false after writing a 401 onto
+// `res`. Skipped under the emulator: dev runs locally with no public exposure
+// and the client doesn't mint App Check tokens there. In prod a missing or
+// invalid token is rejected — this is the app-attestation guard on the public
+// functions.
+async function verifyAppCheck(req, res) {
+  if (process.env.FUNCTIONS_EMULATOR === "true") return true;
+
+  const token = req.get("X-Firebase-AppCheck");
+  if (!token) {
+    res.status(401).json({ error: "Missing App Check token" });
+    return false;
+  }
+  try {
+    await getAppCheck().verifyToken(token);
+    return true;
+  } catch (error) {
+    console.warn("App Check verification failed:", error.code || error.message);
+    res.status(401).json({ error: "Invalid App Check token" });
+    return false;
+  }
 }
 
 // Verify the Firebase ID token on a request. Returns the uid on success, or

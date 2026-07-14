@@ -16,6 +16,8 @@
     "preview": "npm run preview -w client",
     "emulators": "firebase emulators:start",
     "firebase:deploy": "npm run build && firebase deploy",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
@@ -30,6 +32,7 @@
     "globals": "^15.14.0",
     "jscpd": "^5.0.10",
     "knip": "^6.17.1",
-    "prettier": "^3.4.2"
+    "prettier": "^3.4.2",
+    "vitest": "^4.1.10"
   }
 }

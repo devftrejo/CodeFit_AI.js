@@ -6,6 +6,7 @@
 //     directly, because Firebase Hosting buffers SSE from its /api/chat rewrite.
 
 import { getIdToken } from "./auth.js";
+import { getAppCheckToken } from "./firebase.js";
 
 const API_URL = import.meta.env.VITE_API_URL || "/api/chat";
 
@@ -46,6 +47,18 @@ async function authHeader() {
   return `Bearer ${token}`;
 }
 
+// Build the auth + App Check headers shared by every request. The App Check
+// header is omitted in dev (no token) and included in prod, where the functions
+// require it. Spread into each fetch's headers.
+async function commonHeaders() {
+  const headers = { Authorization: await authHeader() };
+  const appCheckToken = await getAppCheckToken();
+  if (appCheckToken) {
+    headers["X-Firebase-AppCheck"] = appCheckToken;
+  }
+  return headers;
+}
+
 // Resolves to { conversationId } once the stream completes. Pass the existing
 // conversationId to continue a conversation, or null/undefined to start a new
 // one (the function creates it and returns the new id in the final SSE event).
@@ -66,7 +79,7 @@ export async function streamChat({
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: await authHeader(),
+      ...(await commonHeaders()),
     },
     body: JSON.stringify({
       message,
@@ -121,7 +134,7 @@ export async function transcribeAudio(blob) {
     method: "POST",
     headers: {
       "Content-Type": blob.type || "audio/webm",
-      Authorization: await authHeader(),
+      ...(await commonHeaders()),
     },
     body: blob,
   });
@@ -141,7 +154,7 @@ export async function synthesizeSpeech(text) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: await authHeader(),
+      ...(await commonHeaders()),
     },
     body: JSON.stringify({ text }),
   });
