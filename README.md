@@ -165,7 +165,7 @@ npm test          # run the suite once
 npm run test:watch  # watch mode
 ```
 
-Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, the client's streaming/error-mapping, and the curriculum data model (unique topic keys + lesson kickoffs) — not full end-to-end coverage.
+Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, the voice endpoints' input guards and audio handling, the client's streaming/error-mapping, and the curriculum data model (unique topic keys + lesson kickoffs) — not full end-to-end coverage.
 
 ### Formatting, Linting & Code Health
 

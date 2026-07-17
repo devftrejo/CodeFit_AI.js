@@ -52,7 +52,7 @@ const VOICE_FN_OPTIONS = {
 // Map the recorder's MIME type to a file extension OpenAI recognizes. The clip
 // is sent as the raw request body; OpenAI sniffs the format from the filename +
 // bytes, so the extension must match what the browser actually recorded.
-function audioExtension(contentType = "") {
+export function audioExtension(contentType = "") {
   const type = contentType.toLowerCase();
   if (type.includes("webm")) return "webm";
   if (type.includes("ogg")) return "ogg";

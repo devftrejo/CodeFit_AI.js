@@ -91,32 +91,68 @@ function updatePreview() {
   `;
 }
 
-function runCode() {
-  const js = jsEditor.state.doc.toString();
-  const oldLog = console.log;
-  const logs = [];
-
-  console.log = function (...args) {
-    logs.push(
-      args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : arg))
-        .join(" ")
-    );
-    oldLog.apply(console, args);
+// Injected into the preview iframe ahead of the user's script so their JS runs
+// inside the sandbox (opaque origin, no `allow-same-origin`) instead of via the
+// old parent-context eval(). It wraps the console methods + window.onerror and
+// postMessages each line back to the parent, which appendConsole() shows in the
+// on-page panel. The sandbox can't reach the app's origin, so nothing here can
+// touch Firebase/the DOM of the app itself. Removing eval() also lets us adopt a
+// CSP without `'unsafe-eval'`.
+const CONSOLE_BRIDGE = `<script>
+(function () {
+  var format = function (a) {
+    try { return typeof a === "object" ? JSON.stringify(a) : String(a); }
+    catch (e) { return String(a); }
   };
+  var post = function (level, args) {
+    parent.postMessage(
+      { __codefitConsole: true, level: level,
+        text: Array.prototype.map.call(args, format).join(" ") },
+      "*"
+    );
+  };
+  ["log", "info", "warn", "error"].forEach(function (m) {
+    var orig = console[m];
+    console[m] = function () {
+      post(m, arguments);
+      if (orig) orig.apply(console, arguments);
+    };
+  });
+  window.addEventListener("error", function (e) { post("error", [e.message]); });
+})();
+</script>`;
 
-  try {
-    eval(js);
-  } finally {
-    console.log = oldLog;
-  }
-
-  consoleElement.innerHTML += logs.join("\n") + "\n";
+// Append a line to the on-page console panel. textContent (not innerHTML) so
+// logged strings are shown literally and can't inject markup into the panel.
+function appendConsole(text) {
+  consoleElement.textContent += text + "\n";
   consoleElement.scrollTop = consoleElement.scrollHeight;
 }
 
+// Console output relayed from the sandboxed preview iframe. Filter to messages
+// from that frame and our bridge marker (ignore Vite HMR / unrelated posts).
+window.addEventListener("message", (event) => {
+  if (event.source !== previewFrame.contentWindow) return;
+  const data = event.data;
+  if (!data || data.__codefitConsole !== true) return;
+  appendConsole(data.text);
+});
+
+function runCode() {
+  // Re-render the preview with the console bridge ahead of the user's script, so
+  // the JS executes in the sandboxed iframe and its output is posted back to the
+  // panel. No code runs in the app's own origin. The live-preview render
+  // (updatePreview) omits the bridge, so the panel only fills on an explicit Run.
+  previewFrame.srcdoc = `
+      ${htmlEditor.state.doc.toString()}
+      <style>${cssEditor.state.doc.toString()}</style>
+      ${CONSOLE_BRIDGE}
+      <script>${jsEditor.state.doc.toString()}</script>
+  `;
+}
+
 function clearConsole() {
-  consoleElement.innerHTML = "";
+  consoleElement.textContent = "";
 }
 
 function changeTheme() {
