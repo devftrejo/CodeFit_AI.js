@@ -29,120 +29,16 @@
           </ul>
         </li>
 
-        <!-- Curriculum -->
+        <!-- Curriculum — tracks/topics rendered by curriculum.js from
+             curriculum-data.js (menu, lesson kickoffs, and progress all derive
+             from that one data source). -->
 
         <li>
           <a href="#" class="submenu-toggle">
             <i class="fa-solid fa-book"></i> Curriculum
             <i class="fa-solid fa-chevron-down"></i>
           </a>
-          <ul class="submenu">
-            <li>
-              <a href="#" class="submenu-toggle">
-                <i class="fa-solid fa-file-code"></i> HTML
-                <i class="fa-solid fa-chevron-down"></i>
-              </a>
-              <ul class="submenu">
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="HTML"
-                    data-topic="Elements"
-                    >Elements</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="HTML"
-                    data-topic="Attributes"
-                    >Attributes</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="HTML"
-                    data-topic="Forms"
-                    >Forms</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#" class="submenu-toggle">
-                <i class="fa-solid fa-paint-brush"></i> CSS
-                <i class="fa-solid fa-chevron-down"></i>
-              </a>
-              <ul class="submenu">
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="CSS"
-                    data-topic="Selectors"
-                    >Selectors</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="CSS"
-                    data-topic="Box Model"
-                    >Box Model</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="CSS"
-                    data-topic="Flexbox"
-                    >Flexbox</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#" class="submenu-toggle">
-                <i class="fa-solid fa-code"></i> JS
-                <i class="fa-solid fa-chevron-down"></i>
-              </a>
-              <ul class="submenu">
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="JavaScript"
-                    data-topic="Variables"
-                    >Variables</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="JavaScript"
-                    data-topic="Functions"
-                    >Functions</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="curriculum-topic"
-                    data-language="JavaScript"
-                    data-topic="Events"
-                    >Events</a
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <ul class="submenu" id="curriculum-menu"></ul>
         </li>
 
         <!-- AI Roles (code personas) — desktop-only: these work on the editor

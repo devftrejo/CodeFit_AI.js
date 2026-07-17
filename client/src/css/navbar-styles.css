@@ -145,6 +145,62 @@ ul.submenu li {
   border: 1px solid var(--js-yellow);
 }
 
+/* Curriculum menu — rendered from curriculum-data.js by curriculum.js */
+
+/* "X / N complete" counter at the top of the Curriculum submenu. */
+.curriculum-progress {
+  padding: 6px 4px 10px 4px;
+  color: var(--js-yellow);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.light-mode .curriculum-progress {
+  color: var(--dark-gray);
+}
+
+/* Non-clickable module heading (e.g. "Getting Started") within a track. */
+.curriculum-module-label {
+  padding: 8px 4px 2px 4px;
+  color: var(--gray);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Lay the topic name and its completion tick on one row. */
+.curriculum-topic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.curriculum-topic .topic-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tick reserves its space (visibility, not display) so rows don't shift when a
+   topic is completed; it only shows once the topic is done. */
+.curriculum-topic .topic-check {
+  margin: 0;
+  width: auto;
+  flex-shrink: 0;
+  color: var(--js-yellow);
+  visibility: hidden;
+}
+
+.light-mode .curriculum-topic .topic-check {
+  color: green;
+}
+
+.curriculum-topic.completed .topic-check {
+  visibility: visible;
+}
+
 /* Dynamic navbar list — the Snippets submenu */
 
 .snippet-list {

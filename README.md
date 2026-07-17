@@ -62,6 +62,8 @@ The client ships five pages:
 
 All five share a top-bar nav. The shared `<head>` and top-bar markup are authored once as Handlebars partials in `client/src/partials/` and included into each page via `vite-plugin-handlebars` (rendered at build time), so they aren't copy-pasted across pages. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
 
+The chat is organized around a **beginner curriculum**: three parallel tracks (HTML, CSS, JavaScript), each with a _Getting Started_ and a _Fundamentals_ module. Every chat is anchored to a topic, and the Curriculum menu tracks your **progress** — a topic is checked off once you've worked through it, with an "X / N complete" counter. The curriculum is data-driven (`client/src/js/curriculum-data.js`), so topics are easy to add, rename, or reorder in one place.
+
 The app supports optional turn-based **voice** chat (speak a question, hear the reply back). Voice is off by default and lives behind a **voice-mode toggle**: turning it on plays a short spoken greeting that explains how to use the mic, then lets you talk to the AI; with it off, chat stays text-only. The app is also **mobile-responsive**: the top bar and marketing pages adapt at a 1024px breakpoint, and under 1024px the app becomes a chat-only tutor (the CodeMirror editor is desktop-only and isn't even loaded on phones).
 
 ## Getting Started
@@ -152,6 +154,8 @@ npm run dev -w client      # Vite client only
 npm run emulators          # Firebase emulator suite only
 ```
 
+**Signing in locally:** the Auth emulator's accounts live in memory and are separate from real Firebase Auth. You don't need your real credentials (or a working Google login) for local dev — just create a throwaway account from the sign-in page's **create account** tab with any email + password. Emulator users are wiped when the emulators restart.
+
 ### Testing
 
 Tests run on **Vitest** from the repo root:
@@ -161,7 +165,7 @@ npm test          # run the suite once
 npm run test:watch  # watch mode
 ```
 
-Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, and the client's streaming/error-mapping — not full end-to-end coverage.
+Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, the client's streaming/error-mapping, and the curriculum data model (unique topic keys + lesson kickoffs) — not full end-to-end coverage.
 
 ### Formatting, Linting & Code Health
 

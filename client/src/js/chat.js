@@ -5,6 +5,7 @@ import { streamChat } from "./api.js";
 import { closeNavbar } from "./navbar.js";
 import { db, auth } from "./firebase.js";
 import { collection, doc, getDocs, writeBatch } from "firebase/firestore";
+import { getTopicKickoff } from "./curriculum-data.js";
 
 // Chat content (AI replies, replayed history, the user's own input) is rendered
 // as Markdown -> HTML and injected via innerHTML. marked does NOT sanitize, so
@@ -181,6 +182,16 @@ export async function sendMessage(customMessage = null) {
       // is history to clear, so enable the control.
       updateChatHeader();
     }
+    // A successful reply means the learner engaged with this topic — mark it
+    // toward their progress. curriculum.js persists it and dedupes, so firing on
+    // every reply (not just the first) is harmless.
+    if (botReply) {
+      document.dispatchEvent(
+        new CustomEvent("topic-progress", {
+          detail: { language: activeTopic.language, topic: activeTopic.topic },
+        })
+      );
+    }
     return botReply;
   } catch (error) {
     console.error("Error:", error);
@@ -291,7 +302,9 @@ export function openTopic({ language, topic, conversationId, messages }) {
   } else {
     currentConversationId = null;
     clearChat();
-    sendMessage(`Explain the ${topic} topic in ${language}.`);
+    // Per-topic opening message (natural beginner phrasing), so orientation
+    // topics don't read as "Explain the What Is HTML? topic in HTML."
+    sendMessage(getTopicKickoff(language, topic));
   }
 
   updateChatHeader();

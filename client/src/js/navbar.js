@@ -6,7 +6,6 @@ const navbar = document.getElementById("navbar");
 const toggleBtn = document.getElementById("toggleBtn");
 const closeBtn = document.getElementById("closeBtn");
 const overlay = document.getElementById("overlay");
-const submenuToggles = document.querySelectorAll(".submenu-toggle");
 
 export function openNavbar() {
   navbar.classList.add("active");
@@ -26,15 +25,17 @@ toggleBtn.addEventListener("click", openNavbar);
 closeBtn.addEventListener("click", closeNavbar);
 overlay.addEventListener("click", closeNavbar);
 
-submenuToggles.forEach((toggle) => {
-  toggle.addEventListener("click", (e) => {
-    e.preventDefault();
-    const submenu = toggle.nextElementSibling;
-    submenu.classList.toggle("active");
-    const icon = toggle.querySelector(".fa-chevron-down, .fa-chevron-up");
-    if (icon) {
-      icon.classList.toggle("fa-chevron-down");
-      icon.classList.toggle("fa-chevron-up");
-    }
-  });
+// Delegated so it also covers submenu toggles rendered after load — the
+// Curriculum tree is built dynamically by curriculum.js from curriculum-data.js.
+navbar.addEventListener("click", (e) => {
+  const toggle = e.target.closest(".submenu-toggle");
+  if (!toggle) return;
+  e.preventDefault();
+  const submenu = toggle.nextElementSibling;
+  submenu.classList.toggle("active");
+  const icon = toggle.querySelector(".fa-chevron-down, .fa-chevron-up");
+  if (icon) {
+    icon.classList.toggle("fa-chevron-down");
+    icon.classList.toggle("fa-chevron-up");
+  }
 });
