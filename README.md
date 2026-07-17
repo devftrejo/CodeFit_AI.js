@@ -206,6 +206,8 @@ npm run firebase:deploy
 
 **Prod streaming note:** the production client calls the Cloud Function **directly** (via `VITE_API_URL` in `client/.env.production`), not the `/api/chat` Hosting rewrite, because Hosting buffers Server-Sent Events. The function sets restricted CORS + `no-transform` so the stream isn't gzip-buffered by Google's frontend.
 
+**Security headers:** Hosting sends hardening response headers on every path — `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (mic allowed for voice; camera/geolocation off), HSTS, and a **`Content-Security-Policy-Report-Only`** header. The CSP is report-only (it logs violations without blocking) and has been validated clean in prod; it can be switched to an enforcing `Content-Security-Policy` when desired. The in-browser code sandbox executes the learner's JS inside a sandboxed `<iframe>` (no `eval` in the app's own origin), with console output bridged back to the on-page panel via `postMessage`.
+
 Pushing changes: use your preferred Git workflow (VSCode UI or CLI).
 
 ## Usage Instructions
