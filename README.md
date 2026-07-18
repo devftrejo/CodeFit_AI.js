@@ -52,15 +52,18 @@ Most dependencies hoist to a single root `node_modules/`, so you install once at
 
 Firebase configuration lives at the repo root: `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`.
 
-The client ships five pages:
+The client ships six pages:
 
 - `/` — landing
-- `/app.html` — the chat + code-sandbox app (gated on sign-in)
+- `/app.html` — the chat + code-sandbox app (gated on sign-in **and** completing the fit assessment)
+- `/assessment.html` — the fit assessment new users complete before the app unlocks
 - `/about.html` — about
 - `/contact.html` — contact
 - `/sign-in.html` — sign-in / create-account (Email/Password + Google)
 
 All five share a top-bar nav. The shared `<head>` and top-bar markup are authored once as Handlebars partials in `client/src/partials/` and included into each page via `vite-plugin-handlebars` (rendered at build time), so they aren't copy-pasted across pages. The chat app additionally has an off-canvas navbar for the Snippets, Curriculum, and AI Roles menus.
+
+New users start with a short **fit assessment** — an original problem-solving quiz plus the public-domain Mini-IPIP Big Five personality measure — that gates the app and produces an encouraging "is coding for you?" readout (a fit signal, suggested tech roles, and where to start). It's a completion gate, not pass/fail: finishing always unlocks the lessons. No trademarked instruments (e.g. Myers-Briggs) are used.
 
 The chat is organized around a **beginner curriculum**: three parallel tracks (HTML, CSS, JavaScript), each with a _Getting Started_ and a _Fundamentals_ module. Every chat is anchored to a topic, and the Curriculum menu tracks your **progress** — a topic is checked off once you've worked through it, with an "X / N complete" counter. The curriculum is data-driven (`client/src/js/curriculum-data.js`), so topics are easy to add, rename, or reorder in one place.
 
@@ -165,7 +168,7 @@ npm test          # run the suite once
 npm run test:watch  # watch mode
 ```
 
-Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, the voice endpoints' input guards and audio handling, the client's streaming/error-mapping, and the curriculum data model (unique topic keys + lesson kickoffs) — not full end-to-end coverage.
+Tests are colocated as `*.test.js` next to the code they cover, and run in Node (no browser/jsdom) with Firebase and OpenAI stubbed, so no emulators or API key are needed. The current suite is a focused hardening layer — the topic-scoped prompt builder, the per-user rate-limit cost guard, the App Check + auth request gate, the voice endpoints' input guards and audio handling, the client's streaming/error-mapping, the curriculum data model (unique topic keys + lesson kickoffs), and the fit-assessment scoring (aptitude bands, Big Five reverse-keying, role mapping) — not full end-to-end coverage.
 
 ### Formatting, Linting & Code Health
 

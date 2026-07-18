@@ -6,6 +6,21 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../theme.js";
 import "../top-bar.js";
 import { onAuthChange } from "../auth.js";
+import { db } from "../firebase.js";
+import { doc, getDoc } from "firebase/firestore";
+
+// New users must finish the fit assessment before the lessons unlock. Returns
+// true if they've completed it (or if the check errors — fail open rather than
+// trap someone out of the app on a transient Firestore hiccup).
+async function hasCompletedAssessment(uid) {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    return Boolean(snap.exists() && snap.data().assessment?.completedAt);
+  } catch (error) {
+    console.error("Assessment gate check failed (allowing through):", error);
+    return true;
+  }
+}
 
 // Firebase fires onAuthChange asynchronously (it reads cached creds first),
 // so we wait for the *first* resolution before deciding what to do. Subsequent
@@ -21,7 +36,14 @@ onAuthChange(async (user) => {
     return;
   }
 
-  // Signed in — load the app modules now that we know the user is allowed.
+  // Gate the app behind the fit assessment — new users are routed there first.
+  if (!(await hasCompletedAssessment(user.uid))) {
+    window.location.replace("/assessment.html");
+    return;
+  }
+
+  // Signed in and assessment done — load the app modules now that we know the
+  // user is allowed.
   // curriculum.js imports chat.js + navbar.js; voice.js imports chat.js +
   // api.js — those dependencies evaluate first.
   const modules = [

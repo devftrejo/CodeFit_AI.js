@@ -13,6 +13,7 @@ const FUNCTIONS_PATH_PREFIX = "/codefit-ai-js/us-central1";
 const PAGE_TITLES = {
   "index.html": "CodeFit_AI.js — AI-powered JavaScript bootcamp",
   "app.html": "App · CodeFit_AI.js",
+  "assessment.html": "Fit Assessment · CodeFit_AI.js",
   "about.html": "About · CodeFit_AI.js",
   "contact.html": "Contact · CodeFit_AI.js",
   "sign-in.html": "Sign in · CodeFit_AI.js",
@@ -41,6 +42,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "src/index.html"),
         app: resolve(__dirname, "src/app.html"),
+        assessment: resolve(__dirname, "src/assessment.html"),
         about: resolve(__dirname, "src/about.html"),
         contact: resolve(__dirname, "src/contact.html"),
         signIn: resolve(__dirname, "src/sign-in.html"),

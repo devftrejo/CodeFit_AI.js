@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {{> head }}
+  </head>
+  <body>
+    {{> top-bar }}
+
+    <main class="assessment-page">
+      <!-- Intro -->
+      <section class="assessment-card" id="assessment-intro">
+        <h1 class="assessment-title">Before you start coding…</h1>
+        <p class="assessment-lead">
+          Let’s get a quick read on your <strong>fit for coding</strong> — how
+          you solve problems and how you like to work. It takes about
+          <strong>5 minutes</strong>, and there’s no passing or failing: it just
+          helps us point you in the right direction. You’ll unlock the lessons
+          as soon as you finish.
+        </p>
+        <ul class="assessment-parts">
+          <li>
+            <i class="fa-solid fa-puzzle-piece"></i>
+            <span
+              ><strong>Problem-solving</strong> — a few pattern &amp; logic
+              questions</span
+            >
+          </li>
+          <li>
+            <i class="fa-solid fa-compass"></i>
+            <span
+              ><strong>Work style</strong> — how you tend to approach
+              things</span
+            >
+          </li>
+        </ul>
+        <button type="button" class="assessment-primary" id="assessment-start">
+          Start the assessment
+        </button>
+      </section>
+
+      <!-- Question flow (aptitude then personality) -->
+      <section class="assessment-card" id="assessment-quiz" hidden>
+        <div class="assessment-progress" aria-hidden="true">
+          <div
+            class="assessment-progress-bar"
+            id="assessment-progress-bar"
+          ></div>
+        </div>
+        <p class="assessment-step-label" id="assessment-step-label"></p>
+        <div id="assessment-questions"></div>
+        <div class="assessment-nav">
+          <button
+            type="button"
+            class="assessment-secondary"
+            id="assessment-back"
+          >
+            Back
+          </button>
+          <button type="button" class="assessment-primary" id="assessment-next">
+            Continue
+          </button>
+        </div>
+      </section>
+
+      <!-- Results (built by assessment.js) -->
+      <section class="assessment-card" id="assessment-results" hidden></section>
+    </main>
+
+    <script type="module" src="./js/entries/assessment.js"></script>
+  </body>
+</html>

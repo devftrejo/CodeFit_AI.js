@@ -1,0 +1,374 @@
+/* Fit assessment page (assessment.html) — the gated intake before the app. */
+
+/* body is a fixed-height flex column with overflow:hidden (the app shell kills
+   mobile pull-to-refresh), so the page must scroll *internally* — flex:1 to fill
+   the space under the top bar, overflow-y:auto to scroll. Mirrors .marketing-page. */
+.assessment-page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 20px 60px;
+  color: var(--light-gray);
+}
+
+.light-mode .assessment-page {
+  color: var(--dark-gray);
+}
+
+.assessment-card {
+  max-width: 760px;
+  margin: 0 auto 24px;
+  background-color: var(--dark-gray);
+  border: 1px solid var(--js-yellow);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.light-mode .assessment-card {
+  background-color: var(--white);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.assessment-title {
+  color: var(--js-yellow);
+  margin: 0 0 12px;
+  font-size: 1.6rem;
+}
+
+.light-mode .assessment-title {
+  color: var(--dark-gray);
+}
+
+.assessment-lead {
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+.assessment-parts {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.assessment-parts li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assessment-parts i {
+  color: var(--js-yellow);
+  width: 24px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Buttons */
+
+.assessment-primary,
+.assessment-secondary {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.assessment-primary {
+  background-color: var(--js-yellow);
+  color: var(--black);
+  border: 1px solid var(--js-yellow);
+  font-weight: bold;
+}
+
+.assessment-primary:hover:not(:disabled) {
+  box-shadow: 0 0 14px rgba(247, 223, 30, 0.5);
+}
+
+.assessment-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.assessment-secondary {
+  background: none;
+  color: var(--light-gray);
+  border: 1px solid var(--gray);
+}
+
+.light-mode .assessment-secondary {
+  color: var(--dark-gray);
+}
+
+.assessment-secondary:hover {
+  border-color: var(--js-yellow);
+}
+
+/* Progress + step label */
+
+.assessment-progress {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.light-mode .assessment-progress {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.assessment-progress-bar {
+  height: 100%;
+  width: 0;
+  background-color: var(--js-yellow);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.assessment-step-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray);
+  margin: 0 0 18px;
+  font-weight: bold;
+}
+
+/* Questions */
+
+.assessment-question {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 20px 0 4px;
+  margin: 0;
+}
+
+.light-mode .assessment-question {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.assessment-question:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.assessment-unanswered {
+  border-left: 3px solid var(--error-red);
+  padding-left: 12px;
+}
+
+.assessment-q-number {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--js-yellow);
+  padding: 0;
+  font-weight: bold;
+}
+
+.light-mode .assessment-q-number {
+  color: var(--gray);
+}
+
+.assessment-prompt {
+  white-space: pre-wrap;
+  overflow-x: auto; /* long code lines scroll in-block, not the page */
+  font-family: "Courier New", monospace;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 10px 0 14px;
+  line-height: 1.5;
+}
+
+.light-mode .assessment-prompt {
+  background-color: var(--light-blue);
+}
+
+.assessment-statement {
+  font-size: 1.05rem;
+  margin: 10px 0 14px;
+}
+
+/* Options / scale */
+
+.assessment-options,
+.assessment-scale {
+  display: grid;
+  gap: 8px;
+}
+
+.assessment-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.assessment-option:hover {
+  border-color: var(--js-yellow);
+}
+
+.assessment-option:has(input:checked) {
+  border-color: var(--js-yellow);
+  background-color: rgba(247, 223, 30, 0.12);
+}
+
+.assessment-option input {
+  accent-color: var(--js-yellow);
+  flex-shrink: 0;
+}
+
+.assessment-hint {
+  color: var(--error-red);
+  min-height: 1.2em;
+  margin: 16px 0 0;
+  font-size: 0.9rem;
+}
+
+.assessment-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* Results */
+
+.assessment-result-block {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 20px 0;
+}
+
+.light-mode .assessment-result-block {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.assessment-result-h {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+
+.assessment-result-h i {
+  color: var(--js-yellow);
+  margin-right: 8px;
+}
+
+.assessment-band {
+  font-size: 1.15rem;
+  font-weight: bold;
+  margin: 0 0 6px;
+}
+
+.assessment-band-score {
+  color: var(--gray);
+  font-weight: normal;
+  font-size: 0.95rem;
+}
+
+.assessment-band-blurb {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.assessment-trait {
+  margin-bottom: 14px;
+}
+
+.assessment-trait-label {
+  margin-bottom: 6px;
+}
+
+.assessment-trait-name {
+  font-weight: bold;
+}
+
+.assessment-trait-blurb {
+  color: var(--gray);
+  font-size: 0.88rem;
+}
+
+.assessment-trait-track {
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.light-mode .assessment-trait-track {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.assessment-trait-fill {
+  height: 100%;
+  background-color: var(--js-yellow);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.assessment-roles {
+  display: grid;
+  gap: 12px;
+}
+
+.assessment-role {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--js-yellow);
+  border-radius: 10px;
+}
+
+.assessment-role-name {
+  font-weight: bold;
+  color: var(--js-yellow);
+}
+
+.light-mode .assessment-role-name {
+  color: var(--dark-gray);
+}
+
+.assessment-role-blurb {
+  font-size: 0.9rem;
+}
+
+.assessment-nudge {
+  line-height: 1.6;
+  margin: 16px 0 22px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--js-yellow);
+  background-color: rgba(247, 223, 30, 0.08);
+  border-radius: 0 8px 8px 0;
+}
+
+/* On phones the assessment is the full experience (no editor to worry about). */
+@media (max-width: 1023px) {
+  .assessment-page {
+    padding: 24px 14px 40px;
+  }
+
+  .assessment-card {
+    padding: 20px;
+  }
+
+  .assessment-title {
+    font-size: 1.35rem;
+  }
+
+  .assessment-nav {
+    flex-direction: column-reverse;
+  }
+
+  .assessment-nav button {
+    width: 100%;
+  }
+}
