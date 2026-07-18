@@ -90,6 +90,21 @@
   margin-bottom: 12px;
 }
 
+/* Numbered badge for the "How it works" step cards (reuses .value-prop). */
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--js-yellow);
+  color: var(--black);
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
 .value-prop h3 {
   margin: 0 0 8px;
   font-size: 18px;
